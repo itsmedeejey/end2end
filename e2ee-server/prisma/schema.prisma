@@ -1,0 +1,177 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../prisma/generated"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ENUMS
+
+enum MessageType {
+  TEXT
+  IMAGE
+  FILE
+}
+
+enum MessageStatus {
+  SENT
+  DELIVERED
+  SEEN
+}
+
+// USERS
+
+model User {
+  id String @id @default(uuid())
+
+  displayName  String
+  uniqueUserId String @unique
+
+  recoveryKeyFingerprint String @unique
+  recoveryKeyHash        String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  conversations  ConversationMember[]
+  messages       Message[]
+  signedPreKeys  UserSignedPreKey[]
+  oneTimePreKeys UserOneTimePreKey[]
+  identityKey    UserIdentityKey?
+  refreshTokens  RefreshToken[]
+}
+
+// CONVERSATIONS (DIRECT ONLY)
+
+model Conversation {
+  id String @id @default(uuid())
+
+  // Unique key for user pair (sorted)
+  directConversationKey String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  members  ConversationMember[]
+  messages Message[]
+}
+
+// CONVERSATION MEMBERS
+
+model ConversationMember {
+  id String @id @default(uuid())
+
+  conversationId String
+  userId         String
+
+  joinedAt DateTime @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, userId])
+}
+
+// MESSAGES
+
+model Message {
+  id String @id @default(uuid())
+
+  conversationId String
+  senderId       String
+
+  ciphertext  String
+  messageType MessageType
+  status      MessageStatus
+
+  protocolVersion String
+  isPreKeyMessage Boolean
+
+  createdAt   DateTime  @default(now())
+  deliveredAt DateTime?
+  seenAt      DateTime?
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@index([senderId])
+}
+
+// IDENTITY KEY (LONG-TERM)
+
+model UserIdentityKey {
+  id String @id @default(uuid())
+
+  userId         String @unique
+  registrationId Int
+  publicKey      String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// SIGNED PRE KEYS (MEDIUM-TERM)
+
+model UserSignedPreKey {
+  id String @id @default(uuid())
+
+  userId    String
+  keyId     Int
+  publicKey String
+  signature String
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  expiresAt DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ONE-TIME PRE KEYS
+
+model UserOneTimePreKey {
+  id String @id @default(uuid())
+
+  userId    String
+  keyId     Int
+  publicKey String
+
+  isUsed Boolean   @default(false)
+  usedAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// REFRESH TOKENS (MULTI-DEVICE SUPPORT)
+
+model RefreshToken {
+  id String @id @default(uuid())
+
+  userId    String
+  tokenHash String
+
+  expiresAt DateTime
+  revokedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
