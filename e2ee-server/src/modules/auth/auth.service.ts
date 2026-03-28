@@ -53,6 +53,7 @@ export class AuthService {
         user.uniqueUserId,
         user.displayName,
       );
+
       return { ...user, recoveryKey, tokens };
     } catch (err) {
       if (err.code === 'P2002') {

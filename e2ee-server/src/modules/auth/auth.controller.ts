@@ -1,8 +1,9 @@
-import type { Response } from "express"
-import { Controller, Post, Body, Res } from '@nestjs/common'
+import type { Response, Request } from "express"
+import { Controller, Post, Body, Res, Req, Get, UseGuards } from '@nestjs/common'
 import { RegisterUserDto } from './dto/registerUser.dto'
 import { LoginUserDto } from './dto/loginUser.dto'
 import { AuthService } from './auth.service'
+import { JwtAuthGuard } from "./jwt-auth.guard"
 
 @Controller('auth')
 export class AuthController {
@@ -29,8 +30,10 @@ export class AuthController {
       maxAge: 30 * 24 * 60 * 60 * 1000,
     })
 
-    //FIX: return safe result
-    return result;
+
+    //eslint-disable-next-line
+    const { tokens, ...safeResult } = result;
+    return safeResult;
   }
 
   @Post("login")
@@ -54,8 +57,24 @@ export class AuthController {
       maxAge: 30 * 24 * 60 * 60 * 1000,
     })
 
-    //FIX: return safe result
-
-    return result;
+    //eslint-disable-next-line
+    const { tokens, ...safeResult } = result;
+    return safeResult;
   }
+
+  @Get("me")
+  @UseGuards(JwtAuthGuard)
+  getProfile(@Req() req: Request) {
+    const token = req.cookies?.accessToken;
+
+    return {
+      user: req.user,
+      accessToken: token,
+    };
+  }
+
+
+
+
+
 }
