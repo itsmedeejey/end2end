@@ -1,86 +1,223 @@
 import {
   WebSocketGateway,
+  WebSocketServer,
+  SubscribeMessage,
   OnGatewayConnection,
   OnGatewayDisconnect,
-  SubscribeMessage,
-  MessageBody,
   ConnectedSocket,
+  MessageBody,
+  WsException,
 } from '@nestjs/websockets';
-import { JwtService } from '@nestjs/jwt';
-import { Socket } from 'socket.io';
-import { WsException } from '@nestjs/websockets';
-import { UseGuards } from '@nestjs/common';
-import { WsJwtGuard } from './ws-jwt-guard';
+import { Logger } from '@nestjs/common';
+import { Server, Socket } from 'socket.io';
+import { PrismaService } from 'src/database/prisma.service';
+import { MessageStatus, MessageType } from 'prisma/generated/client';
+import { JwtPayload } from '../auth/types/jwt-payload.type';
+import { TokenService } from '../auth/token.service';
+
+interface GatewaySocketData {
+  user?: JwtPayload;
+}
 
 @WebSocketGateway({
   cors: {
-    origin: true,
-    credentials: true,
+    origin: '*',
   },
 })
-export class websocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
-  constructor(private readonly jwtService: JwtService) { }
+export class WebsocketGateway
+  implements OnGatewayConnection, OnGatewayDisconnect {
+  @WebSocketServer()
+  server: Server;
 
+  private logger = new Logger(WebsocketGateway.name);
+
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly tokenService: TokenService,
+  ) { }
+
+  private getSocketUser(client: Socket): JwtPayload | undefined {
+    return (client.data as GatewaySocketData).user;
+  }
+
+  private setSocketUser(client: Socket, user: JwtPayload): void {
+    (client.data as GatewaySocketData).user = user;
+  }
+
+  private getRequiredSocketUser(client: Socket): JwtPayload {
+    const user = this.getSocketUser(client);
+    if (!user) {
+      throw new WsException('Unauthorized');
+    }
+    return user;
+  }
+
+  private normalizePayload(rawData: unknown): Record<string, unknown> {
+    const isRecord = (value: unknown): value is Record<string, unknown> =>
+      typeof value === 'object' && value !== null && !Array.isArray(value);
+
+    let payload: unknown = rawData;
+
+    if (typeof payload === 'string') {
+      try {
+        payload = JSON.parse(payload);
+      } catch {
+        throw new WsException('Invalid JSON payload');
+      }
+    }
+
+    if (!isRecord(payload)) {
+      throw new WsException('Invalid payload');
+    }
+
+    const nestedData = payload.data;
+
+    if (isRecord(nestedData)) {
+      return nestedData;
+    }
+
+    return payload;
+  }
+
+  //  CONNECTION HANDLER
   async handleConnection(client: Socket) {
     try {
-      const token = this.extractTokenFromCookie(client);
+      //  Extract token
 
-      if (!token) throw new Error('No token');
+      const token = client.handshake.auth?.token;
 
-      const payload = await this.jwtService.verifyAsync(token, {
-        secret: process.env.JWT_ACCESS_SECRET,
+
+      if (typeof token !== 'string' || token.length === 0) {
+        throw new WsException('No token provided');
+      }
+
+      //  Verify token
+      const payload = await this.tokenService.verifyAccessToken(token);
+
+      //  Attach user to socket
+      this.setSocketUser(client, payload);
+
+      const userId = payload.sub;
+
+      //  Fetch all conversations of user
+      const memberships = await this.prisma.conversationMember.findMany({
+        where: { userId },
+        select: { conversationId: true },
       });
 
-      // attach user to socket
-      client.data.user = {
-        userId: payload.sub,
-      };
+      //  Join all conversation rooms
+      await Promise.all(
+        memberships.map((m) => Promise.resolve(client.join(m.conversationId))),
+      );
 
-      console.log(` Connected: ${payload.sub}`);
+      this.logger.log(`User connected: ${userId}`);
     } catch (err) {
-      console.error(err)
-      console.log(` Connection rejected: ${client.id}`);
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      this.logger.error(`Connection failed: ${message}`);
       client.disconnect();
     }
   }
 
+  //  DISCONNECT HANDLER
   handleDisconnect(client: Socket) {
-    console.log(` Disconnected: ${client.id}`);
+    const user = this.getSocketUser(client);
+
+    if (user) {
+      this.logger.log(`User disconnected: ${user.sub}`);
+    }
   }
 
-  // Example event
-
-  @UseGuards(WsJwtGuard)
+  //  SEND MESSAGE
   @SubscribeMessage('send_message')
-  handleMessage(
+  async handleSendMessage(
+    @MessageBody() rawData: unknown,
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: any,
   ) {
-    const user = client.data.user;
+    const user = this.getRequiredSocketUser(client);
+    const userId = user.sub;
+    const data = this.normalizePayload(rawData);
+    const conversationId = data.conversationId;
+    const content = data.content;
 
-    if (!user) {
-      throw new WsException('Unauthorized');
+    if (
+      typeof conversationId !== 'string' ||
+      conversationId.trim().length === 0 ||
+      typeof content !== 'string' ||
+      content.trim().length === 0
+    ) {
+      throw new WsException('conversationId and content are required');
     }
 
-    console.log(` ${user.userId}:`, data);
+    // 1. Check if user is part of conversation
+    const isMember = await this.prisma.conversationMember.findFirst({
+      where: {
+        conversationId,
+        userId,
+      },
+    });
+
+    if (!isMember) {
+      throw new WsException('Not a member of this conversation');
+    }
+
+    // 2. Save message
+    const message = await this.prisma.message.create({
+      data: {
+        conversationId,
+        senderId: userId,
+        messageType: MessageType.TEXT,
+        status: MessageStatus.SENT,
+        protocolVersion: '1.0',
+        isPreKeyMessage: false,
+        ciphertext: content,
+      },
+    });
+
+    // 3. Emit to all users in that conversation
+    client.to(conversationId).emit('receive_message', message);
 
     return {
-      status: 'ok',
+      status: 'sent',
+      messageId: message.id,
     };
   }
 
-  private extractTokenFromCookie(client: Socket): string | undefined {
-    const cookieHeader = client.handshake.headers.cookie;
-    if (!cookieHeader) return undefined;
+  //  TYPING INDICATOR
+  @SubscribeMessage('typing')
+  handleTyping(
+    @MessageBody()
+    data: { conversationId: string },
+    @ConnectedSocket() client: Socket,
+  ) {
+    const user = this.getRequiredSocketUser(client);
 
-    const cookies = Object.fromEntries(
-      cookieHeader.split(';').map((c) => {
-        const [k, ...v] = c.trim().split('=');
-        return [k, decodeURIComponent(v.join('='))];
-      }),
-    );
-
-    return cookies['access_token'];
+    client.to(data.conversationId).emit('typing', {
+      userId: user.sub,
+    });
   }
 
+  //  MESSAGE READ
+  @SubscribeMessage('mark_read')
+  async handleMarkRead(
+    @MessageBody()
+    data: {
+      conversationId: string;
+      messageId: string;
+    },
+    @ConnectedSocket() client: Socket,
+  ) {
+    const user = this.getRequiredSocketUser(client);
+
+    await this.prisma.message.update({
+      where: { id: data.messageId },
+      data: {
+        status: MessageStatus.SEEN,
+      },
+    });
+
+    this.server.to(data.conversationId).emit('message_read', {
+      messageId: data.messageId,
+      userId: user.sub,
+    });
+  }
 }

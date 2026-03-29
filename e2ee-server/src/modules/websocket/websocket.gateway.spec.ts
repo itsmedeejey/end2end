@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { JwtService } from '@nestjs/jwt';
 import { WebsocketGateway } from './websocket.gateway';
 
 describe('WebsocketGateway', () => {
@@ -6,7 +7,15 @@ describe('WebsocketGateway', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [WebsocketGateway],
+      providers: [
+        WebsocketGateway,
+        {
+          provide: JwtService,
+          useValue: {
+            verifyAsync: jest.fn(),
+          },
+        },
+      ],
     }).compile();
 
     gateway = module.get<WebsocketGateway>(WebsocketGateway);

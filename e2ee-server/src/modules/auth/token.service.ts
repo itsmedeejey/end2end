@@ -17,6 +17,7 @@ export class TokenService {
       sub: userId,
       uid: uniqueUserId,
       name: displayName,
+      type: 'access' as const,
     };
 
     return this.jwtService.signAsync(payload, {
@@ -34,6 +35,7 @@ export class TokenService {
       sub: userId,
       uid: uniqueUserId,
       name: displayName,
+      type: 'refresh' as const,
     };
     const refreshToken = await this.jwtService.signAsync(payload, {
       secret: process.env.JWT_REFRESH_SECRET,
@@ -65,20 +67,28 @@ export class TokenService {
 
   async verifyAccessToken(token: string): Promise<JwtPayload> {
     try {
-      return await this.jwtService.verifyAsync(token, {
+      const payload = await this.jwtService.verifyAsync<JwtPayload>(token, {
         secret: process.env.JWT_ACCESS_SECRET as string,
       });
-    } catch (err) {
+      if (payload.type !== 'access') {
+        throw new UnauthorizedException('Invalid access token type');
+      }
+      return payload;
+    } catch {
       throw new UnauthorizedException('Invalid or expired access token');
     }
   }
 
   async verifyRefreshToken(token: string): Promise<JwtPayload> {
     try {
-      return await this.jwtService.verifyAsync(token, {
+      const payload = await this.jwtService.verifyAsync<JwtPayload>(token, {
         secret: process.env.JWT_REFRESH_SECRET,
       });
-    } catch (err) {
+      if (payload.type !== 'refresh') {
+        throw new UnauthorizedException('Invalid refresh token type');
+      }
+      return payload;
+    } catch {
       throw new UnauthorizedException('Invalid or expired refresh token');
     }
   }
