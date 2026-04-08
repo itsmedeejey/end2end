@@ -1,6 +1,7 @@
-import axios from "axios"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import axios from "@/config/axios"
+
 
 export default function LoginCard() {
   const [key, setKey] = useState<string>("")
@@ -22,12 +23,9 @@ export default function LoginCard() {
     try {
       setLoading(true)
       await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/login`,
+        "/api/auth/login",
         {
           recoveryKey: key.trim(),
-        },
-        {
-          withCredentials: true,
         }
       )
       router.push("/")

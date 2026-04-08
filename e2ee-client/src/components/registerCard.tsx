@@ -1,7 +1,7 @@
 "use client"
-import axios from "axios"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import axios from "@/config/axios"
 
 export default function RegisterCard() {
   const [name, setName] = useState<string>("")
@@ -23,12 +23,9 @@ export default function RegisterCard() {
     try {
       setLoading(true)
       await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/register`,
+        "/api/auth/register",
         {
           displayName: name.trim(),
-        },
-        {
-          withCredentials: true,
         }
       )
       router.push("/")

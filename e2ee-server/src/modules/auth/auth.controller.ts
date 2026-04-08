@@ -65,6 +65,7 @@ export class AuthController {
   @Get("me")
   @UseGuards(JwtAuthGuard)
   getProfile(@Req() req: Request) {
+
     const token = req.cookies?.accessToken;
 
     return {
