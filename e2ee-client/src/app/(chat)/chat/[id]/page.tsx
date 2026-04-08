@@ -6,7 +6,7 @@ import { useParams } from "next/navigation";
 import { useChatStore } from "@/store/chat.store";
 import { useAuthStore } from "@/store/auth.store";
 import ChatUi from "@/components/chatUi";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 
 export default function Chat() {
@@ -26,15 +26,19 @@ export default function Chat() {
 
     setActiveConversationId(conversationId);
     loadMessages(conversationId);
-  }, [conversationId]);
+  }, [conversationId, loadMessages, setActiveConversationId]);
 
   const activeConversation = conversations.find(
     (c) => c.conversationId === conversationId
   );
 
-  const messages =
-    conversationId ? messagesByConversation[conversationId] || [] : [];
+  const messages = useMemo(
+    () => (conversationId ? messagesByConversation[conversationId] || [] : []),
+    [conversationId, messagesByConversation]
+  );
 
+
+  //smooth scroll to bottom when chat is opened
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
@@ -43,9 +47,10 @@ export default function Chat() {
       el.scrollHeight - el.scrollTop - el.clientHeight < 100;
 
     if (isNearBottom) {
-      el.scrollTop = el.scrollHeight;
+      el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+
     }
-  }, [messages.length]);
+  }, [messages]);
 
   if (!conversationId) return null;
 

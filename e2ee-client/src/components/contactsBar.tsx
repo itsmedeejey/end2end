@@ -14,6 +14,18 @@ export default function ContactsBar() {
     router.push(`/chat/${id}`);
   };
 
+  //TODO: logout
+  // const handleLogout = async () => {
+  //   try {
+  //     await api.post("/api/auth/logout");
+  //     disconnectSocket();
+  //     clearAuth();
+  //     router.replace("/login");
+  //   } catch (err) {
+  //     console.error("Logout failed:", err);
+  //   }
+  // };
+  //
 
   return (
     <div className="flex flex-col h-full w-full">

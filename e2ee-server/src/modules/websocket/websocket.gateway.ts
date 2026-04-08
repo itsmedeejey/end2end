@@ -138,14 +138,17 @@ export class WebsocketGateway
     const data = this.normalizePayload(rawData);
     const conversationId = data.conversationId;
     const content = data.content;
+    const clientTempId = data.clientTempId;
 
     if (
       typeof conversationId !== 'string' ||
       conversationId.trim().length === 0 ||
       typeof content !== 'string' ||
-      content.trim().length === 0
+      content.trim().length === 0 ||
+      typeof clientTempId !== 'string' ||
+      clientTempId.trim().length === 0
     ) {
-      throw new WsException('conversationId and content are required');
+      throw new WsException('conversationId, content and clientTempId are required');
     }
 
     // 1. Check if user is part of conversation
@@ -173,12 +176,21 @@ export class WebsocketGateway
       },
     });
 
+    const serverCreatedAt = message.createdAt.toISOString();
+
     // 3. Emit to all users in that conversation
-    client.to(conversationId).emit('receive_message', message);
+    client.to(conversationId).emit('receive_message', {
+      ...message,
+      createdAt: serverCreatedAt,
+      status: 'sent',
+      clientTempId,
+    });
 
     return {
-      status: 'sent',
+      status: 'ok',
       messageId: message.id,
+      createdAt: serverCreatedAt,
+      clientTempId,
     };
   }
 

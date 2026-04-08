@@ -1,53 +1,57 @@
 "use client"
 
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import ContactsBar from "@/components/contactsBar";
 import { useChatStore } from "@/store/chat.store";
-import { SocketProvider } from "@/provider/socketProvider";
 import { useAuthStore } from "@/store/auth.store";
-import api from "@/config/axios";
+import { useInitAuth } from "@/hooks/useInitAuth";
+import { useSocketInit } from "@/hooks/useSocketInit";
+import { useSocketConnection } from "@/hooks/useSocketConnection";
 
 export default function ChatLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const router = useRouter();
+  useInitAuth();
+  useSocketInit();
+  useSocketConnection();
+
+  const status = useAuthStore((state) => state.status);
   const loadConversations = useChatStore((state) => state.loadConversations);
-  const setUserId = useAuthStore((state) => state.setUserId);
 
   useEffect(() => {
-    loadConversations();
-  }, [loadConversations]);
+    if (status === "authenticated") {
+      loadConversations();
+    }
+  }, [status, loadConversations]);
 
   useEffect(() => {
-    const loadCurrentUser = async () => {
-      try {
-        const { data } = await api.get<{ user?: { sub?: string } }>("/api/auth/me");
-        const sub = data?.user?.sub;
+    if (status === "unauthenticated") {
+      router.replace("/login");
+    }
+  }, [status, router]);
 
-        if (sub) {
-          setUserId(sub);
-        }
-      } catch (err) {
-        console.error("Failed to load auth profile:", err);
-      }
-    };
-
-    loadCurrentUser();
-  }, [setUserId]);
-
-  return (
-    <SocketProvider>
+  const content =
+    status === "loading" ? (
+      <div className="flex h-screen w-screen items-center justify-center bg-gray-900 text-white">
+        Authenticating...
+      </div>
+    ) : status !== "authenticated" ? (
+      <div className="flex h-screen w-screen items-center justify-center bg-gray-900 text-gray-300">
+        Redirecting to login...
+      </div>
+    ) : (
       <div className="flex h-screen w-screen overflow-hidden bg-gray-900">
-        <div className="flex bg-gray-800 w-2/5  lg:w-1/5">
+        <div className="flex bg-gray-800 w-2/5 lg:w-1/5">
           <ContactsBar />
         </div>
 
-        <div className="flex w-3/5 lg:w-4/5 flex-col">
-          {children}
-        </div>
+        <div className="flex w-3/5 lg:w-4/5 flex-col">{children}</div>
       </div>
+    );
 
-    </SocketProvider>
-  );
+  return content;
 }

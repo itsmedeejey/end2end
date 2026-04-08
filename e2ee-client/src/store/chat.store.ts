@@ -4,11 +4,55 @@ import api from "@/config/axios";
 import { GetConversationsResponse } from "@/types/loadConversation.type";
 import { ChatMessage } from "@/types/message.type";
 
+const getTimestamp = (createdAt: string): number => {
+  const ts = Date.parse(createdAt);
+  return Number.isNaN(ts) ? 0 : ts;
+};
+
+const sortMessages = (messages: ChatMessage[]): ChatMessage[] =>
+  [...messages].sort(
+    (a, b) => getTimestamp(a.createdAt) - getTimestamp(b.createdAt)
+  );
+
+const isSameMessage = (left: ChatMessage, right: ChatMessage): boolean => {
+  if (left.id === right.id) return true;
+  if (!left.clientTempId || !right.clientTempId) return false;
+  return (
+    left.clientTempId === right.clientTempId &&
+    left.senderId === right.senderId
+  );
+};
+
+const upsertMessages = (
+  existing: ChatMessage[],
+  incoming: ChatMessage[]
+): ChatMessage[] => {
+  const next = [...existing];
+
+  for (const message of incoming) {
+    const index = next.findIndex((item) => isSameMessage(item, message));
+
+    if (index === -1) {
+      next.push(message);
+      continue;
+    }
+
+    next[index] = { ...next[index], ...message };
+  }
+
+  return sortMessages(next);
+};
+
 type ChatStore = {
   conversations: GetConversationsResponse;
   activeConversationId: string | null;
   messagesByConversation: Record<string, ChatMessage[]>;
   socketConnected: boolean;
+
+  updateMessage: (
+    messageId: string,
+    updates: Partial<ChatMessage>
+  ) => void;
 
   // actions
   setConversations: (convs: GetConversationsResponse) => void;
@@ -19,7 +63,6 @@ type ChatStore = {
   loadMessages: (conversationId: string) => Promise<void>;
   markSocketConnected: (connected: boolean) => void;
 };
-
 export const useChatStore = create<ChatStore>((set) => ({
   // state
   conversations: [],
@@ -49,21 +92,22 @@ export const useChatStore = create<ChatStore>((set) => ({
     set((state) => ({
       messagesByConversation: {
         ...state.messagesByConversation,
-        [conversationId]: messages,
+        [conversationId]: upsertMessages(
+          state.messagesByConversation[conversationId] || [],
+          messages
+        ),
       },
     })),
 
   appendMessage: (message) =>
     set((state) => {
       const existing = state.messagesByConversation[message.conversationId] || [];
-      const alreadyExists = existing.some((item) => item.id === message.id);
-
-      if (alreadyExists) return state;
+      const merged = upsertMessages(existing, [message]);
 
       return {
         messagesByConversation: {
           ...state.messagesByConversation,
-          [message.conversationId]: [...existing, message],
+          [message.conversationId]: merged,
         },
       };
     }),
@@ -77,7 +121,10 @@ export const useChatStore = create<ChatStore>((set) => ({
       set((state) => ({
         messagesByConversation: {
           ...state.messagesByConversation,
-          [conversationId]: data ?? [],
+          [conversationId]: upsertMessages(
+            state.messagesByConversation[conversationId] || [],
+            data ?? []
+          ),
         },
       }));
     } catch (err) {
@@ -88,6 +135,37 @@ export const useChatStore = create<ChatStore>((set) => ({
       );
     }
   },
+  updateMessage: (messageId, updates) =>
+    set((state) => {
+      const updated: Record<string, ChatMessage[]> = {};
+      let touched = false;
+
+      for (const [convId, messages] of Object.entries(
+        state.messagesByConversation
+      )) {
+        const mapped = messages.map((msg) => {
+          if (msg.id === messageId || msg.clientTempId === messageId) {
+            touched = true;
+            return { ...msg, ...updates };
+          }
+
+          return msg;
+        });
+
+        updated[convId] = upsertMessages([], mapped);
+      }
+
+      if (!touched) {
+        return state;
+      }
+
+      return {
+        messagesByConversation: updated,
+      };
+    }),
+
 
   markSocketConnected: (connected) => set({ socketConnected: connected }),
+
+
 }));
