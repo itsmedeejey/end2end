@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import axios from "@/config/axios"
-
+import { proxyApi } from "@/config/axios"
+import axios from 'axios'
 
 export default function LoginCard() {
   const [key, setKey] = useState<string>("")
@@ -22,8 +22,8 @@ export default function LoginCard() {
 
     try {
       setLoading(true)
-      await axios.post(
-        "/api/auth/login",
+      await proxyApi.post(
+        "/auth/login",
         {
           recoveryKey: key.trim(),
         }

@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
 import ContactsBar from "@/components/contactsBar";
 import { useChatStore } from "@/store/chat.store";
 import { useAuthStore } from "@/store/auth.store";
@@ -14,7 +13,6 @@ export default function ChatLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const router = useRouter();
   useInitAuth();
   useSocketInit();
   useSocketConnection();
@@ -27,12 +25,6 @@ export default function ChatLayout({
       loadConversations();
     }
   }, [status, loadConversations]);
-
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.replace("/login");
-    }
-  }, [status, router]);
 
   const content =
     status === "loading" ? (
