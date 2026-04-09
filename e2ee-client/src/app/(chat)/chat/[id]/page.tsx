@@ -17,9 +17,14 @@ export default function Chat() {
   const messagesByConversation = useChatStore((s) => s.messagesByConversation);
   const loadMessages = useChatStore((s) => s.loadMessages);
   const setActiveConversationId = useChatStore((s) => s.setActiveConversationId);
+  const socketConnected = useChatStore((s) => s.socketConnected);
   const currentUserId = useAuthStore((s) => s.userId);
 
   const scrollRef = useRef<HTMLDivElement>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const wasNearBottomRef = useRef(true);
+  const previousConversationIdRef = useRef<string | null>(null);
+  const previousMessageCountRef = useRef(0);
 
   useEffect(() => {
     if (!conversationId) return;
@@ -37,20 +42,56 @@ export default function Chat() {
     [conversationId, messagesByConversation]
   );
 
-
-  //smooth scroll to bottom when chat is opened
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
 
-    const isNearBottom =
-      el.scrollHeight - el.scrollTop - el.clientHeight < 100;
+    const handleScroll = () => {
+      wasNearBottomRef.current =
+        el.scrollHeight - el.scrollTop - el.clientHeight < 120;
+    };
 
-    if (isNearBottom) {
-      el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+    handleScroll();
+    el.addEventListener("scroll", handleScroll);
+    return () => el.removeEventListener("scroll", handleScroll);
+  }, []);
 
+  // Poll messages only when socket is disconnected.
+  useEffect(() => {
+    if (!conversationId || socketConnected) return;
+
+    const intervalId = window.setInterval(() => {
+      loadMessages(conversationId);
+    }, 4000);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, [conversationId, socketConnected, loadMessages]);
+
+  // Auto-scroll on initial load / conversation switch / incoming new messages.
+  useEffect(() => {
+    const hasConversationChanged =
+      previousConversationIdRef.current !== conversationId;
+    const hasNewMessage = messages.length > previousMessageCountRef.current;
+
+    if (hasConversationChanged) {
+      previousConversationIdRef.current = conversationId;
+      previousMessageCountRef.current = messages.length;
+      requestAnimationFrame(() => {
+        bottomRef.current?.scrollIntoView({ behavior: "auto" });
+      });
+      return;
     }
-  }, [messages]);
+
+    if (hasNewMessage && wasNearBottomRef.current) {
+      requestAnimationFrame(() => {
+        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+      });
+    }
+
+    previousMessageCountRef.current = messages.length;
+  }, [conversationId, messages.length]);
 
   if (!conversationId) return null;
 
@@ -74,6 +115,7 @@ export default function Chat() {
             />
           );
         })}
+        <div ref={bottomRef} />
       </div>
 
       <div className="p-2">

@@ -14,7 +14,7 @@ export const useInitAuth = () => {
         const userId = res.data?.user?.sub  //NOTE: getting user's DBid from api
         const token = res.data?.accessToken;
 
-        if (!userId) {
+        if (!userId || !token) {
           if (!cancelled) {
             useAuthStore.getState().clearAuth();
           }
