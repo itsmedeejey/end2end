@@ -83,3 +83,9 @@ report.*.json
 # ----------------------------
 .vercel
 /generated/prisma
+
+
+
+clean_dump.sql 
+dump.sql 
+
