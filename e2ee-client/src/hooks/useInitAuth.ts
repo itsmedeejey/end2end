@@ -11,11 +11,7 @@ export const useInitAuth = () => {
     const init = async () => {
       try {
         const res = await api.get("/api/auth/me");
-        const userId =
-          res.data?.user?.id ??
-          res.data?.user?.sub ??
-          res.data?.user?.uid ??
-          res.data?.user?.uniqueUserId;
+        const userId = res.data?.user?.sub  //NOTE: getting user's DBid from api
         const token = res.data?.accessToken;
 
         if (!userId) {
