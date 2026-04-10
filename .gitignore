@@ -89,3 +89,7 @@ report.*.json
 clean_dump.sql 
 dump.sql 
 
+
+# Ignore localhost certificates
+localhost.pem
+localhost-key.pem

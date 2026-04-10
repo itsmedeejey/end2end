@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { proxyApi } from "@/config/axios";
+import api from "@/config/axios";
 import { useAuthStore } from "@/store/auth.store";
 
 export const useInitAuth = () => {
@@ -22,7 +22,7 @@ export const useInitAuth = () => {
 
     const init = async (retry = 0): Promise<void> => {
       try {
-        const res = await proxyApi.get("/auth/me");
+        const res = await api.get("api/auth/me");
 
         const userId = res.data?.user?.sub;
         const token = res.data?.accessToken;

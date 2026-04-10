@@ -15,18 +15,17 @@ export class AuthController {
 
     const result = await this.authService.registerUser(dto)
 
-    const isProd: boolean = process.env.NODE_ENV === "production";
     res.cookie("accessToken", result.tokens.accessToken, {
       httpOnly: true,
-      secure: isProd,
-      sameSite: isProd ? "none" : "lax",
+      secure: true,
+      sameSite: "lax",
       maxAge: 24 * 60 * 60 * 1000,
     })
 
     res.cookie("refreshToken", result.tokens.refreshToken, {
       httpOnly: true,
-      secure: isProd,
-      sameSite: isProd ? "none" : "lax",
+      secure: true,
+      sameSite: "lax",
       maxAge: 30 * 24 * 60 * 60 * 1000,
     })
 
@@ -43,19 +42,18 @@ export class AuthController {
   ) {
     const result = await this.authService.loginUser(dto)
 
-    const isProd: boolean = process.env.NODE_ENV === "production";
 
     res.cookie("accessToken", result.tokens.accessToken, {
       httpOnly: true,
-      secure: isProd,
-      sameSite: isProd ? "none" : "lax",
+      secure: true,
+      sameSite: "lax",
       maxAge: 24 * 60 * 60 * 1000,
     })
 
     res.cookie("refreshToken", result.tokens.refreshToken, {
       httpOnly: true,
-      secure: isProd,
-      sameSite: isProd ? "none" : "lax",
+      secure: true,
+      sameSite: "lax",
       maxAge: 30 * 24 * 60 * 60 * 1000,
     })
 

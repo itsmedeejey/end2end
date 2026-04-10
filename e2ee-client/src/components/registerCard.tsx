@@ -1,7 +1,7 @@
 "use client"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { proxyApi } from "@/config/axios"
+import api from "@/config/axios"
 import axios from 'axios'
 
 export default function RegisterCard() {
@@ -23,8 +23,8 @@ export default function RegisterCard() {
 
     try {
       setLoading(true)
-      await proxyApi.post(
-        "/auth/register",
+      await api.post(
+        "api/auth/register",
         {
           displayName: name.trim(),
         }
