@@ -1,56 +1,56 @@
 # End2End
 
-Privacy-first chat platform with a Next.js client and a NestJS backend, built to evolve into full end-to-end encrypted messaging.
+Privacy-first chat app with a Next.js client and a NestJS backend. The project is structured for Signal-style E2EE, but the current runtime flow is auth + conversation + realtime message delivery with ciphertext stored as plain text content.
 
 ## Overview
 
-This repository contains two apps:
+This repository contains:
 
 - `e2ee-client`: Next.js (App Router) frontend
-- `e2ee-server`: NestJS API + Socket.IO realtime gateway + Prisma/PostgreSQL
+- `e2ee-server`: NestJS API + Socket.IO gateway + Prisma/PostgreSQL
 
-Current implementation already includes:
+What is implemented today:
 
-- Recovery-key based account creation/login
-- JWT auth with HTTP-only cookies for REST APIs
-- Direct conversation creation by `uniqueUserId`
-- Realtime messaging pipeline with Socket.IO rooms
-- Message persistence in PostgreSQL via Prisma
-
-The cryptographic data models for Signal-style key material are present in the schema, while full key exchange and client-side encrypted message flow are still in progress.
+- Recovery-key based register/login
+- Access + refresh JWT cookies (`HttpOnly`, `Secure`, `SameSite=None`)
+- Authenticated conversation listing and message history loading
+- Direct-conversation create/find API by `uniqueUserId`
+- Socket.IO messaging with room join on connect
+- Optimistic message UI + ack reconciliation on sender side
+- Polling fallback when socket is disconnected
 
 ## Tech Stack
 
 | Layer | Technology |
 | --- | --- |
-| Frontend | Next.js 16, React 19, TypeScript, Tailwind CSS 4, Axios |
-| Realtime/crypto client deps | Socket.IO client flow (gateway compatible), `@privacyresearch/libsignal-protocol-typescript` |
-| Backend | NestJS 11, TypeScript, Passport JWT, Socket.IO |
-| Database | PostgreSQL + Prisma 7 (`@prisma/adapter-pg`) |
-| Auth | Access/refresh JWT + HTTP-only cookies + fingerprinted/hashed recovery keys |
+| Frontend | Next.js 16, React 19, TypeScript, Tailwind CSS 4, Axios, Zustand |
+| Backend | NestJS 11, Passport JWT, Socket.IO, TypeScript |
+| Database | PostgreSQL + Prisma 7 |
+| Crypto deps (WIP wiring) | `@privacyresearch/libsignal-protocol-typescript` |
 
 ## Repository Structure
 
 ```text
 .
 ├── e2ee-client/
-│   ├── src/app/                # Next.js app routes
-│   ├── src/components/         # Login/register/contacts UI
-│   └── src/lib/libsigal/       # Key generation helper (WIP integration)
+│   ├── src/app/                # routes
+│   ├── src/components/         # login/register/chat UI
+│   ├── src/hooks/              # auth/socket/message hooks
+│   └── src/store/              # auth/chat state (zustand)
 └── e2ee-server/
-    ├── src/modules/auth/       # Register/login/JWT strategy/token service
-    ├── src/modules/conversation/
-    ├── src/modules/websocket/  # Realtime events
+    ├── src/modules/auth/       # register/login/me + JWT strategy/token service
+    ├── src/modules/conversation/ # list chats, load messages, find/create conversation
+    ├── src/modules/websocket/  # realtime gateway events
     ├── src/database/           # Prisma service
     └── prisma/schema.prisma
 ```
 
-## Architecture
+## Runtime Architecture
 
 ```mermaid
 flowchart LR
-  C[Next.js Client] -->|REST /api| A[NestJS API]
-  C -->|Socket.IO + access token| W[NestJS WebSocket Gateway]
+  C[Next.js Client] -->|REST /api/* + cookies| A[NestJS API]
+  C -->|Socket.IO + cookie auth| W[NestJS WebSocket Gateway]
   A --> P[(PostgreSQL via Prisma)]
   W --> P
 ```
@@ -60,21 +60,19 @@ flowchart LR
 ### 1) Prerequisites
 
 - Node.js 20+
-- pnpm 9+ (for server)
-- npm 10+ (for client)
+- pnpm 9+ (server)
+- npm 10+ (client)
 - PostgreSQL 15+
 
-### 2) Clone and install
+### 2) Install dependencies
 
 ```bash
 git clone <your-repo-url>
 cd end2end
 
-# server
 cd e2ee-server
 pnpm install
 
-# client
 cd ../e2ee-client
 npm install
 ```
@@ -85,21 +83,42 @@ Create `e2ee-server/.env`:
 
 ```env
 PORT=4000
-ORIGIN_URL=http://localhost:3000
+NODE_ENV=dev
 
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/e2ee
 
 JWT_ACCESS_SECRET=replace-with-a-long-random-secret
 JWT_REFRESH_SECRET=replace-with-a-different-long-random-secret
+
+# comma separated origins
+CORS_ORIGINS=https://localhost:3000
+
+# optional (set in production when needed)
+DOMAIN=
 ```
 
 Create `e2ee-client/.env.local`:
 
 ```env
-NEXT_PUBLIC_SERVER_URL=http://localhost:4000
+NEXT_PUBLIC_SERVER_URL=https://localhost:4000
 ```
 
-### 4) Prepare database
+### 4) Dev TLS certificates (required by current server boot flow)
+
+When `NODE_ENV !== production`, server starts in HTTPS mode and expects these files in `e2ee-server/`:
+
+- `localhost+2-key.pem`
+- `localhost+2.pem`
+
+If missing, generate them (example using `mkcert`):
+
+```bash
+cd e2ee-server
+mkcert -install
+mkcert localhost 127.0.0.1 ::1
+```
+
+### 5) Prepare database
 
 ```bash
 cd e2ee-server
@@ -107,7 +126,7 @@ pnpm prisma migrate deploy
 pnpm prisma generate
 ```
 
-### 5) Run both apps
+### 6) Run both apps
 
 ```bash
 # terminal 1
@@ -118,110 +137,89 @@ pnpm start:dev
 ```bash
 # terminal 2
 cd e2ee-client
-npm run dev
+npm run https
 ```
 
-Open `http://localhost:3000`.
+Open `https://localhost:3000`.
 
-## Current Product Flow
+## Current Application Flow
 
-1. Open `/login` in the client.
-2. Register using a display name.
-3. Server generates and stores:
-   - `uniqueUserId` (public user identifier)
-   - one-time recovery key fingerprint + hash
-4. Client can log in using recovery key.
-5. Server sets `accessToken` + `refreshToken` HTTP-only cookies.
-6. Authenticated users can create/get direct conversations.
-7. Client connects to Socket.IO using access token in handshake auth.
-8. Messages are stored and broadcast to conversation rooms.
+1. User opens `/login`.
+2. User chooses:
+   - register: submit `displayName` to `POST /api/auth/register`
+   - login: submit `recoveryKey` to `POST /api/auth/login`
+3. Server sets `accessToken` + `refreshToken` cookies and returns user payload (`register` also returns one-time `recoveryKey`).
+4. Client redirects to `/`.
+5. Route protection in `src/proxy.ts`:
+   - unauthenticated users are redirected from `/` and `/chat/*` to `/login`
+   - authenticated users are redirected from `/login` to `/`
+6. Chat layout initializes auth by calling `GET /api/auth/me` (`useInitAuth`), then sets Zustand auth state.
+7. On authenticated state:
+   - client loads conversations via `GET /api/conversation`
+   - socket connection is opened (`withCredentials: true`)
+8. On `/chat/:id`, client loads history with `GET /api/conversation/loadchats?conversationId=...`.
+9. Sending a message:
+   - client appends optimistic message with `status="sending"`
+   - emits `send_message` with `{ conversationId, content, clientTempId }`
+   - server validates membership, persists message, returns ack
+   - sender reconciles optimistic message from ack
+   - other room members receive `receive_message`
+10. If socket disconnects, client polls message history every 4 seconds for the active conversation.
+
+Current UI limitation:
+
+- "start a new chat" button is present but not wired yet.
+- `typing` and `mark_read` socket events exist server-side but are not emitted by current UI.
 
 ## API Reference (Implemented)
 
-Base URL: `http://localhost:4000/api`
+Base URL: `https://localhost:4000/api`
 
-### `POST /auth/register`
+### Auth
 
-Creates a user using `displayName`, generates recovery key, sets cookies.
+- `POST /auth/register` body: `{ "displayName": "Alice" }`
+- `POST /auth/login` body: `{ "recoveryKey": "word1 word2 ... word12" }`
+- `GET /auth/me` (requires `accessToken` cookie)
 
-Request:
+### Conversation
 
-```json
-{
-  "displayName": "Alice"
-}
-```
-
-Response (tokens omitted from JSON body; sent via cookies):
-
-```json
-{
-  "id": "uuid",
-  "uniqueUserId": "hex-id",
-  "displayName": "Alice",
-  "createdAt": "2026-03-29T00:00:00.000Z",
-  "recoveryKey": "word1 word2 ... word12"
-}
-```
-
-### `POST /auth/login`
-
-Logs in using recovery key, sets access/refresh cookies.
-
-Request:
-
-```json
-{
-  "recoveryKey": "word1 word2 ... word12"
-}
-```
-
-### `GET /auth/me`
-
-Returns current user from `accessToken` cookie.
-
-### `POST /conversation`
-
-Requires auth cookie. Finds or creates a direct conversation with user by `uniqueUserId`.
-
-Request:
-
-```json
-{
-  "to": "<recipient-uniqueUserId>"
-}
-```
-
-Response:
-
-```json
-"<conversationId>"
-```
+- `GET /conversation` (requires auth cookie) -> conversation list with participant metadata
+- `GET /conversation/loadchats?conversationId=<id>` (requires auth cookie) -> ordered messages
+- `POST /conversation/getid` body: `{ "to": "<recipientUniqueUserId>" }` (requires auth cookie) -> find/create direct conversation
 
 ## Socket.IO Events (Implemented)
 
-Handshake auth:
-
-- `auth.token`: access token string (JWT access token)
+Handshake auth: `accessToken` is read from cookies during websocket connection.
 
 Client -> Server:
 
-- `send_message`: `{ conversationId, content }`
+- `send_message`: `{ conversationId, content, clientTempId }`
 - `typing`: `{ conversationId }`
 - `mark_read`: `{ conversationId, messageId }`
 
 Server -> Client:
 
-- `receive_message`: persisted message object
+- `receive_message`: persisted message payload for room members (excluding sender socket)
 - `typing`: `{ userId }`
 - `message_read`: `{ messageId, userId }`
 
+Ack from `send_message`:
+
+```json
+{
+  "status": "ok",
+  "messageId": "uuid",
+  "createdAt": "2026-04-10T00:00:00.000Z",
+  "clientTempId": "local-..."
+}
+```
+
 ## Security Notes
 
-- Recovery keys are normalized and hashed (`bcrypt`) before storage.
-- Access and refresh tokens are HTTP-only cookies in REST flow.
-- `secure` cookie flag is currently `false` for local development; set to `true` behind HTTPS in production.
-- Message content is currently stored as `ciphertext`, but full client-side encryption/session key exchange is not wired end-to-end yet.
+- Recovery keys are fingerprinted + hashed before storage.
+- Tokens are cookie-based and marked `HttpOnly`, `Secure`, `SameSite=None`.
+- Refresh tokens are persisted in DB; refresh rotation/logout endpoints are not yet implemented.
+- Message `ciphertext` is currently storing raw message content; full client-side encryption/session exchange is still pending.
 
 ## Development Commands
 
@@ -239,20 +237,8 @@ Client (`e2ee-client`):
 
 ```bash
 npm run dev
+npm run https
 npm run build
 npm run start
 npm run lint
 ```
-
-## Roadmap
-
-- Enable full Signal-style key registration endpoints (identity/signed pre-key/one-time pre-keys)
-- Encrypt message payloads client-side before `send_message`
-- Implement refresh-token rotation + revocation checks
-- Add conversation/message history APIs
-- Replace placeholder contacts UI with real user search + chat thread rendering
-- Add production hardening (rate limits, secure cookies, CSRF strategy, observability)
-
-## License
-
-The server package is currently marked `UNLICENSED`. Add a project license before public distribution.
