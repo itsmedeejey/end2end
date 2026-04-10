@@ -76,6 +76,27 @@ pids/
 # Misc
 # ----------------------------
 *.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.crt
+*.cer
+*.der
+certificates/
+*.sqlite
+*.sqlite3
+*.db
+*.db-wal
+*.db-shm
+*.dump
+*.bak
+*dump*.sql
+*backup*.sql
+secrets.*
+credentials.*
+backups/
+.backups/
 report.*.json
 
 # ----------------------------
@@ -84,12 +105,6 @@ report.*.json
 .vercel
 /generated/prisma
 
-
-
-clean_dump.sql 
-dump.sql 
-
-
 # Ignore localhost certificates
-localhost.pem
-localhost-key.pem
+localhost+2.pem
+localhost+2-key.pem

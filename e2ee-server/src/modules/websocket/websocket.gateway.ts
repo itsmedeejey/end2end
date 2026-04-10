@@ -14,14 +14,20 @@ import { PrismaService } from 'src/database/prisma.service';
 import { MessageStatus, MessageType } from 'prisma/generated/client';
 import { JwtPayload } from '../auth/types/jwt-payload.type';
 import { TokenService } from '../auth/token.service';
+import * as cookie from 'cookie';
 
 interface GatewaySocketData {
   user?: JwtPayload;
 }
 
+const origins = process.env.CORS_ORIGINS
+  ?.split(',')
+  .map(o => o.trim()) || [];
+
 @WebSocketGateway({
   cors: {
-    origin: '*',
+    origin: origins,
+    credentials: true,
   },
 })
 export class WebsocketGateway
@@ -84,8 +90,11 @@ export class WebsocketGateway
     try {
       //  Extract token
 
-      const token = client.handshake.auth?.token;
+      const raw = client.handshake.headers?.cookie || "";
 
+      const parsed = cookie.parse(raw);
+
+      const token = parsed["accessToken"];
 
       if (typeof token !== 'string' || token.length === 0) {
         throw new WsException('No token provided');

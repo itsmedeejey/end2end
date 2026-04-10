@@ -5,9 +5,34 @@ import { LoginUserDto } from './dto/loginUser.dto'
 import { AuthService } from './auth.service'
 import { JwtAuthGuard } from "./jwt-auth.guard"
 
+type Tokens = {
+  accessToken: string;
+  refreshToken: string;
+};
+
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) { }
+  private setAuthCookies(res: Response, tokens: Tokens) {
+    const options = {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none" as const,
+      domain: process.env.DOMAIN || undefined,
+      path: "/",
+    };
+
+    res.cookie("accessToken", tokens.accessToken, {
+      ...options,
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
+    res.cookie("refreshToken", tokens.refreshToken, {
+      ...options,
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+    });
+  }
+
   @Post('register')
   async register(
     @Body() dto: RegisterUserDto,
@@ -15,20 +40,8 @@ export class AuthController {
 
     const result = await this.authService.registerUser(dto)
 
-    res.cookie("accessToken", result.tokens.accessToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "lax",
-      maxAge: 24 * 60 * 60 * 1000,
-    })
 
-    res.cookie("refreshToken", result.tokens.refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "lax",
-      maxAge: 30 * 24 * 60 * 60 * 1000,
-    })
-
+    this.setAuthCookies(res, result.tokens)
 
     //eslint-disable-next-line
     const { tokens, ...safeResult } = result;
@@ -42,20 +55,7 @@ export class AuthController {
   ) {
     const result = await this.authService.loginUser(dto)
 
-
-    res.cookie("accessToken", result.tokens.accessToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "lax",
-      maxAge: 24 * 60 * 60 * 1000,
-    })
-
-    res.cookie("refreshToken", result.tokens.refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "lax",
-      maxAge: 30 * 24 * 60 * 60 * 1000,
-    })
+    this.setAuthCookies(res, result.tokens)
 
     //eslint-disable-next-line
     const { tokens, ...safeResult } = result;
@@ -66,11 +66,8 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   getProfile(@Req() req: Request) {
 
-    const token = req.cookies?.accessToken;
-
     return {
       user: req.user,
-      accessToken: token,
     };
   }
 

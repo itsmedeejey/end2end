@@ -6,15 +6,14 @@ import { connectSocket, disconnectSocket } from "@/lib/socket/connect";
 
 export const useSocketInit = () => {
   const status = useAuthStore((s) => s.status);
-  const accessToken = useAuthStore((s) => s.accessToken);
 
   useEffect(() => {
-    if (status === "authenticated" && accessToken) {
+    if (status === "authenticated") {
       connectSocket();
     }
 
     if (status === "unauthenticated") {
       disconnectSocket();
     }
-  }, [status, accessToken]);
+  }, [status]);
 };

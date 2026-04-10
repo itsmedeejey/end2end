@@ -7,10 +7,11 @@ type AuthStatus = "loading" | "authenticated" | "unauthenticated";
 
 type AuthState = {
   userId: string | null;
-  accessToken: string | null;
+  uniqueUserId: string | null;
+  name: string | null;
   status: AuthStatus;
 
-  setAuth: (userId: string, token?: string | null) => void;
+  setAuth: (userId: string, uniqueUserId?: string, name?: string | null) => void;
   clearAuth: () => void;
 };
 
@@ -18,28 +19,33 @@ export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
       userId: null,
-      accessToken: null,
+      uniqueUserId: null,
+      name: null,
       status: "loading",
 
-      setAuth: (userId, token = null) =>
+      setAuth: (userId, uniqueUserId, name = null) =>
         set({
           userId,
-          accessToken: token,
+          uniqueUserId: uniqueUserId,
+          name: name,
           status: "authenticated",
         }),
 
       clearAuth: () =>
         set({
+          uniqueUserId: null,
+          name: null,
           userId: null,
-          accessToken: null,
           status: "unauthenticated",
         }),
     }),
     {
-      // Persist only userId. Access token stays in memory.
+      // Persist user details
       name: "auth-storage",
       partialize: (state) => ({
         userId: state.userId,
+        uniqueUserId: state.uniqueUserId,
+        name: state.name
       }),
     }
   )

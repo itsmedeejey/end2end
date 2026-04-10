@@ -8,9 +8,9 @@ export const useInitAuth = () => {
   useEffect(() => {
     let cancelled = false;
 
-    const setAuthSafely = (userId: string, token: string) => {
+    const setAuthSafely = (userId: string, uniqueUserId: string, displayName: string) => {
       if (!cancelled) {
-        useAuthStore.getState().setAuth(userId, token);
+        useAuthStore.getState().setAuth(userId, uniqueUserId, displayName);
       }
     };
 
@@ -25,14 +25,15 @@ export const useInitAuth = () => {
         const res = await api.get("api/auth/me");
 
         const userId = res.data?.user?.sub;
-        const token = res.data?.accessToken;
+        const uniqueUserId = res.data?.user?.uid;
+        const displayName = res.data?.user?.name;
 
-        if (!userId || !token) {
+        if (!userId) {
           clearAuthSafely();
           return;
         }
 
-        setAuthSafely(userId, token);
+        setAuthSafely(userId, uniqueUserId, displayName);
         return;
         //eslint-disable-next-line
       } catch (err: any) { //TODO:  type safe it????
