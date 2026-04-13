@@ -7,6 +7,7 @@ import { useAuthStore } from "@/store/auth.store";
 import { useInitAuth } from "@/hooks/useInitAuth";
 import { useSocketInit } from "@/hooks/useSocketInit";
 import { useSocketConnection } from "@/hooks/useSocketConnection";
+import SearchBar from "@/components/searchBar";
 
 export default function ChatLayout({
   children,
@@ -19,13 +20,13 @@ export default function ChatLayout({
 
   const status = useAuthStore((state) => state.status);
   const loadConversations = useChatStore((state) => state.loadConversations);
+  const isSearchOpen = useChatStore((state) => state.isSearchOpen);
 
   useEffect(() => {
     if (status === "authenticated") {
       loadConversations();
     }
   }, [status, loadConversations]);
-
   const content =
     status === "loading" ? (
       <div className="flex h-screen w-screen items-center justify-center bg-gray-900 text-white">
@@ -37,11 +38,21 @@ export default function ChatLayout({
       </div>
     ) : (
       <div className="flex h-screen w-screen overflow-hidden bg-gray-900">
+
         <div className="flex bg-gray-800 w-2/5 lg:w-1/5">
           <ContactsBar />
         </div>
 
         <div className="flex w-3/5 lg:w-4/5 flex-col">{children}</div>
+
+        <div className=" ">
+          {isSearchOpen && (
+            <SearchBar />
+          )}
+
+        </div>
+
+
       </div>
     );
 

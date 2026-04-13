@@ -31,8 +31,6 @@ export class ConversationController {
     return conversation;
   }
 
-
-
   @Get('loadchats')
   @UseGuards(JwtAuthGuard)
   async getChats(
@@ -47,7 +45,6 @@ export class ConversationController {
   }
 
 
-
   // this route is for searching a user returning conversation id if exist or create it ...
   @Post('getid')
   @UseGuards(JwtAuthGuard)
@@ -59,6 +56,5 @@ export class ConversationController {
       this.conversationService.findOrCreateConversationId(dto.to, req.user.sub);
     return conversation;
   }
-
 
 }

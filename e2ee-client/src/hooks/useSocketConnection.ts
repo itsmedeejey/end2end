@@ -53,6 +53,7 @@ export const useSocketConnection = () => {
       }
     });
 
+
     return () => {
       isMounted = false;
       socket.off("connect");

@@ -15,6 +15,7 @@ import { MessageStatus, MessageType } from 'prisma/generated/client';
 import { JwtPayload } from '../auth/types/jwt-payload.type';
 import { TokenService } from '../auth/token.service';
 import * as cookie from 'cookie';
+import { SendMessageDto } from './dto/sendMessage.dto';
 
 interface GatewaySocketData {
   user?: JwtPayload;
@@ -30,8 +31,10 @@ const origins = process.env.CORS_ORIGINS
     credentials: true,
   },
 })
+
 export class WebsocketGateway
   implements OnGatewayConnection, OnGatewayDisconnect {
+
   @WebSocketServer()
   server: Server;
 
@@ -56,33 +59,6 @@ export class WebsocketGateway
       throw new WsException('Unauthorized');
     }
     return user;
-  }
-
-  private normalizePayload(rawData: unknown): Record<string, unknown> {
-    const isRecord = (value: unknown): value is Record<string, unknown> =>
-      typeof value === 'object' && value !== null && !Array.isArray(value);
-
-    let payload: unknown = rawData;
-
-    if (typeof payload === 'string') {
-      try {
-        payload = JSON.parse(payload);
-      } catch {
-        throw new WsException('Invalid JSON payload');
-      }
-    }
-
-    if (!isRecord(payload)) {
-      throw new WsException('Invalid payload');
-    }
-
-    const nestedData = payload.data;
-
-    if (isRecord(nestedData)) {
-      return nestedData;
-    }
-
-    return payload;
   }
 
   //  CONNECTION HANDLER
@@ -127,6 +103,14 @@ export class WebsocketGateway
     }
   }
 
+  @SubscribeMessage("join:conversation")
+  async handleJoinConversation(
+    @MessageBody() conversationId: string,
+    @ConnectedSocket() client: Socket,
+  ) {
+    await client.join(conversationId);
+  }
+
   //  DISCONNECT HANDLER
   handleDisconnect(client: Socket) {
     const user = this.getSocketUser(client);
@@ -136,29 +120,18 @@ export class WebsocketGateway
     }
   }
 
-  //  SEND MESSAGE
+  // SEND MESSAGE
   @SubscribeMessage('send_message')
   async handleSendMessage(
-    @MessageBody() rawData: unknown,
+    @MessageBody() data: SendMessageDto,
     @ConnectedSocket() client: Socket,
   ) {
     const user = this.getRequiredSocketUser(client);
     const userId = user.sub;
-    const data = this.normalizePayload(rawData);
     const conversationId = data.conversationId;
     const content = data.content;
     const clientTempId = data.clientTempId;
 
-    if (
-      typeof conversationId !== 'string' ||
-      conversationId.trim().length === 0 ||
-      typeof content !== 'string' ||
-      content.trim().length === 0 ||
-      typeof clientTempId !== 'string' ||
-      clientTempId.trim().length === 0
-    ) {
-      throw new WsException('conversationId, content and clientTempId are required');
-    }
 
     // 1. Check if user is part of conversation
     const isMember = await this.prisma.conversationMember.findFirst({

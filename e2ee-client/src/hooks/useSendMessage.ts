@@ -25,11 +25,12 @@ export const useSendMessage = () => {
 
     const socket = getSocket();
 
+    //TODO: create the clientTempId from senderid and reciever's id ???
     const tempId = `local-${Date.now()}-${Math.random()
       .toString(36)
       .slice(2, 10)}`;
 
-    // ✅ optimistic message
+    //  optimistic message
     const optimisticMessage: ChatMessage = {
       id: tempId,
       clientTempId: tempId,
@@ -70,7 +71,7 @@ export const useSendMessage = () => {
           return;
         }
 
-        // ✅ reconcile
+        //  reconcile
         updateMessage(ack.clientTempId, {
           id: ack.messageId,
           createdAt: ack.createdAt,

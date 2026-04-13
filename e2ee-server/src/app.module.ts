@@ -3,12 +3,12 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './modules/auth/auth.module';
 import { PrismaModule } from './database/prisma.module';
-import { WebsocketGateway } from './modules/websocket/websocket.gateway';
 import { ConversationModule } from './modules/conversation/conversation.module';
+import { WebsocketModule } from './modules/websocket/websocket.module';
 
 @Module({
-  imports: [AuthModule, PrismaModule, ConversationModule,],
+  imports: [AuthModule, PrismaModule, ConversationModule, WebsocketModule,],
   controllers: [AppController],
-  providers: [AppService, WebsocketGateway],
+  providers: [AppService], //removed WebsocketGateway here
 })
 export class AppModule { }

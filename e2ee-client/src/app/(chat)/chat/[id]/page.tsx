@@ -7,6 +7,7 @@ import { useChatStore } from "@/store/chat.store";
 import { useAuthStore } from "@/store/auth.store";
 import ChatUi from "@/components/chatUi";
 import { useEffect, useMemo, useRef } from "react";
+import { useChatSocket } from "@/hooks/useChatSocket";
 
 
 export default function Chat() {
@@ -20,18 +21,36 @@ export default function Chat() {
   const socketConnected = useChatStore((s) => s.socketConnected);
   const currentUserId = useAuthStore((s) => s.userId);
 
+  const { joinConversation, leaveConversation } = useChatSocket();
+
   const scrollRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const wasNearBottomRef = useRef(true);
   const previousConversationIdRef = useRef<string | null>(null);
   const previousMessageCountRef = useRef(0);
 
+
+  //when a new conversatioin is added this connects the user to the that converstion room
+  useEffect(() => {
+    if (!conversationId) return;
+
+    joinConversation(conversationId);
+
+    return () => {
+      leaveConversation(conversationId);
+    };
+  }, [conversationId, joinConversation, leaveConversation]);
+
   useEffect(() => {
     if (!conversationId) return;
 
     setActiveConversationId(conversationId);
+
     loadMessages(conversationId);
-  }, [conversationId, loadMessages, setActiveConversationId]);
+    return () => {
+      leaveConversation(conversationId);
+    };
+  }, [conversationId, loadMessages, setActiveConversationId, leaveConversation]);
 
   const activeConversation = conversations.find(
     (c) => c.conversationId === conversationId

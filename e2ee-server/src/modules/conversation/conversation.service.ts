@@ -50,7 +50,7 @@ export class ConversationService {
     if (existing) {
       return {
         conversationId: existing.id,
-        user,
+        participant: user,
       };
     }
 
@@ -71,7 +71,7 @@ export class ConversationService {
 
       return {
         conversationId: conversation.id,
-        user,
+        participant: user,
       };
     } catch (error) {
       // Handle duplicate creation
@@ -83,7 +83,7 @@ export class ConversationService {
       if (fallback) {
         return {
           conversationId: fallback.id,
-          user,
+          participant: user,
         };
       }
 
@@ -91,8 +91,7 @@ export class ConversationService {
     }
   }
 
-  //FIX:
-  //wft fuck is it
+  //TODO:
   async GetConversations(
     currentUserId: string,
   ): Promise<GetConversationsResponse> {

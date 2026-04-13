@@ -48,6 +48,7 @@ type ChatStore = {
   activeConversationId: string | null;
   messagesByConversation: Record<string, ChatMessage[]>;
   socketConnected: boolean;
+  isSearchOpen: boolean;
 
   updateMessage: (
     messageId: string,
@@ -55,8 +56,10 @@ type ChatStore = {
   ) => void;
 
   // actions
+  addConversation: (conv: GetConversationsResponse[number]) => void;
   setConversations: (convs: GetConversationsResponse) => void;
   setActiveConversationId: (id: string | null) => void;
+  setIsSearchOpen: (open: boolean) => void;
   loadConversations: () => Promise<void>;
   setMessages: (conversationId: string, messages: ChatMessage[]) => void;
   appendMessage: (message: ChatMessage) => void;
@@ -69,11 +72,13 @@ export const useChatStore = create<ChatStore>((set) => ({
   activeConversationId: null,
   messagesByConversation: {},
   socketConnected: false,
+  isSearchOpen: false,
 
   // actions
   setConversations: (convs) => set({ conversations: convs }),
 
   setActiveConversationId: (id) => set({ activeConversationId: id }),
+  setIsSearchOpen: (open) => set({ isSearchOpen: open }),
 
   loadConversations: async () => {
     try {
@@ -167,5 +172,19 @@ export const useChatStore = create<ChatStore>((set) => ({
 
   markSocketConnected: (connected) => set({ socketConnected: connected }),
 
+  //adding new conversation after serach returns conversationId
+
+  addConversation: (conv) =>
+    set((state) => {
+      const exists = state.conversations.find(
+        (c) => c.conversationId === conv.conversationId
+      );
+
+      if (exists) return state;
+
+      return {
+        conversations: [conv, ...state.conversations], // add on top
+      };
+    }),
 
 }));
