@@ -9,8 +9,8 @@
  * 🟢 You can import this file directly.
  */
 import type * as runtime from "@prisma/client/runtime/client"
-import type * as $Enums from "../enums"
-import type * as Prisma from "../internal/prismaNamespace"
+import type * as $Enums from "../enums.js"
+import type * as Prisma from "../internal/prismaNamespace.js"
 
 /**
  * Model UserSignedPreKey
@@ -266,10 +266,10 @@ export type UserSignedPreKeyOrderByWithRelationInput = {
 
 export type UserSignedPreKeyWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  userId?: string
   AND?: Prisma.UserSignedPreKeyWhereInput | Prisma.UserSignedPreKeyWhereInput[]
   OR?: Prisma.UserSignedPreKeyWhereInput[]
   NOT?: Prisma.UserSignedPreKeyWhereInput | Prisma.UserSignedPreKeyWhereInput[]
-  userId?: Prisma.StringFilter<"UserSignedPreKey"> | string
   keyId?: Prisma.IntFilter<"UserSignedPreKey"> | number
   publicKey?: Prisma.StringFilter<"UserSignedPreKey"> | string
   signature?: Prisma.StringFilter<"UserSignedPreKey"> | string
@@ -278,7 +278,7 @@ export type UserSignedPreKeyWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"UserSignedPreKey"> | Date | string
   expiresAt?: Prisma.DateTimeFilter<"UserSignedPreKey"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-}, "id">
+}, "id" | "userId">
 
 export type UserSignedPreKeyOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -489,6 +489,10 @@ export type UserSignedPreKeyUncheckedUpdateManyWithoutUserNestedInput = {
   update?: Prisma.UserSignedPreKeyUpdateWithWhereUniqueWithoutUserInput | Prisma.UserSignedPreKeyUpdateWithWhereUniqueWithoutUserInput[]
   updateMany?: Prisma.UserSignedPreKeyUpdateManyWithWhereWithoutUserInput | Prisma.UserSignedPreKeyUpdateManyWithWhereWithoutUserInput[]
   deleteMany?: Prisma.UserSignedPreKeyScalarWhereInput | Prisma.UserSignedPreKeyScalarWhereInput[]
+}
+
+export type BoolFieldUpdateOperationsInput = {
+  set?: boolean
 }
 
 export type UserSignedPreKeyCreateWithoutUserInput = {

@@ -9,8 +9,8 @@
  * 🟢 You can import this file directly.
  */
 import type * as runtime from "@prisma/client/runtime/client"
-import type * as $Enums from "../enums"
-import type * as Prisma from "../internal/prismaNamespace"
+import type * as $Enums from "../enums.js"
+import type * as Prisma from "../internal/prismaNamespace.js"
 
 /**
  * Model UserIdentityKey
@@ -408,14 +408,6 @@ export type UserIdentityKeyUncheckedUpdateOneWithoutUserNestedInput = {
   delete?: Prisma.UserIdentityKeyWhereInput | boolean
   connect?: Prisma.UserIdentityKeyWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserIdentityKeyUpdateToOneWithWhereWithoutUserInput, Prisma.UserIdentityKeyUpdateWithoutUserInput>, Prisma.UserIdentityKeyUncheckedUpdateWithoutUserInput>
-}
-
-export type IntFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
 }
 
 export type UserIdentityKeyCreateWithoutUserInput = {

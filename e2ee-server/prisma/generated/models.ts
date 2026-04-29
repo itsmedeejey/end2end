@@ -8,12 +8,12 @@
  *
  * 🟢 You can import this file directly.
  */
-export type * from './models/User'
-export type * from './models/Conversation'
-export type * from './models/ConversationMember'
-export type * from './models/Message'
-export type * from './models/UserIdentityKey'
-export type * from './models/UserSignedPreKey'
-export type * from './models/UserOneTimePreKey'
-export type * from './models/RefreshToken'
-export type * from './commonInputTypes'
+export type * from './models/User.js'
+export type * from './models/Conversation.js'
+export type * from './models/ConversationMember.js'
+export type * from './models/Message.js'
+export type * from './models/UserIdentityKey.js'
+export type * from './models/UserSignedPreKey.js'
+export type * from './models/UserOneTimePreKey.js'
+export type * from './models/RefreshToken.js'
+export type * from './commonInputTypes.js'

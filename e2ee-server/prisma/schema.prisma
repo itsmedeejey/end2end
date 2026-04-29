@@ -84,12 +84,11 @@ model Message {
   conversationId String
   senderId       String
 
-  ciphertext  String
+  ciphertext        String @db.Text
+  signalMessageType Int // 1 or 3
+
   messageType MessageType
   status      MessageStatus
-
-  protocolVersion String
-  isPreKeyMessage Boolean
 
   createdAt   DateTime  @default(now())
   deliveredAt DateTime?
@@ -122,7 +121,7 @@ model UserIdentityKey {
 model UserSignedPreKey {
   id String @id @default(uuid())
 
-  userId    String
+  userId    String @unique
   keyId     Int
   publicKey String
   signature String

@@ -17,8 +17,8 @@
 
 import * as runtime from "@prisma/client/runtime/index-browser"
 
-export type * from '../models'
-export type * from './prismaNamespace'
+export type * from '../models.js'
+export type * from './prismaNamespace.js'
 
 export const Decimal = runtime.Decimal
 
@@ -115,10 +115,9 @@ export const MessageScalarFieldEnum = {
   conversationId: 'conversationId',
   senderId: 'senderId',
   ciphertext: 'ciphertext',
+  signalMessageType: 'signalMessageType',
   messageType: 'messageType',
   status: 'status',
-  protocolVersion: 'protocolVersion',
-  isPreKeyMessage: 'isPreKeyMessage',
   createdAt: 'createdAt',
   deliveredAt: 'deliveredAt',
   seenAt: 'seenAt'

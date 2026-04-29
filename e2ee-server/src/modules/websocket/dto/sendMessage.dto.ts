@@ -1,12 +1,16 @@
-import { IsString, IsUUID, MinLength } from 'class-validator';
+import { IsString, IsUUID, MinLength, IsIn, IsBase64, MaxLength } from 'class-validator';
 
 export class SendMessageDto {
   @IsUUID()
   conversationId: string;
 
-  @IsString()
+  @IsBase64()
   @MinLength(1)
-  content: string;
+  @MaxLength(20000)
+  cipherText: string;
+
+  @IsIn([1, 3])
+  messageType: 1 | 3;
 
   @IsString()
   @MinLength(1)
