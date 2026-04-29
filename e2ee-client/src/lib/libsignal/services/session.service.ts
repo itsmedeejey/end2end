@@ -14,6 +14,7 @@ export async function ensureSession(
   if (existing) return;
 
   // fetch from backend
+  //TODO: fetchPreKeyBundle from server
   const bundle = await fetchPreKeyBundle(receiverId);
 
   await createSession(store, receiverId, bundle);
