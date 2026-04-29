@@ -5,9 +5,9 @@ import ContactsBar from "@/components/contactsBar";
 import { useChatStore } from "@/store/chat.store";
 import { useAuthStore } from "@/store/auth.store";
 import { useInitAuth } from "@/hooks/useInitAuth";
-import { useSocketInit } from "@/hooks/useSocketInit";
 import { useSocketConnection } from "@/hooks/useSocketConnection";
 import SearchBar from "@/components/searchBar";
+import { SignalProvider } from "@/provider/signalProvider";
 
 export default function ChatLayout({
   children,
@@ -15,7 +15,6 @@ export default function ChatLayout({
   children: React.ReactNode;
 }>) {
   useInitAuth();
-  useSocketInit();
   useSocketConnection();
 
   const status = useAuthStore((state) => state.status);
@@ -56,5 +55,11 @@ export default function ChatLayout({
       </div>
     );
 
-  return content;
+  return status === "authenticated" ? (
+    <SignalProvider>
+      {content}
+    </SignalProvider>
+  ) : (
+    content
+  );
 }

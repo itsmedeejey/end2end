@@ -4,62 +4,54 @@ import { useEffect } from "react";
 import { getSocket } from "@/lib/socket/socket";
 import { useChatStore } from "@/store/chat.store";
 import { useAuthStore } from "@/store/auth.store";
-import { ChatMessage } from "@/types/message.type";
+import { useIncomingStore } from "@/store/incoming.msg.store";
+import { IncomingMessage } from "@/store/incoming.msg.store";
+import { connectSocket } from "@/lib/socket/connect";
 
 export const useSocketConnection = () => {
-  const appendMessage = useChatStore((s) => s.appendMessage);
-  const updateMessage = useChatStore((s) => s.updateMessage);
+  const userId = useAuthStore((s) => s.userId);
+
   const markSocketConnected = useChatStore((s) => s.markSocketConnected);
+  const enqueue = useIncomingStore((s) => s.enqueue);
 
   useEffect(() => {
-    let isMounted = true;
+    if (!userId) return;
+
     const socket = getSocket();
 
-    // CONNECT
-    socket.on("connect", () => {
-      console.log("Socket connected:", socket.id);
-      if (isMounted) markSocketConnected(true);
-    });
+    const onConnect = () => {
+      markSocketConnected(true);
+    };
 
-    // DISCONNECT
-    socket.on("disconnect", () => {
-      console.log("Socket disconnected");
-      if (isMounted) markSocketConnected(false);
-    });
+    const onDisconnect = () => {
+      markSocketConnected(false);
+    };
 
-    // RECEIVE MESSAGE
-    socket.on("receive_message", (message: ChatMessage) => {
-      const normalizedMessage: ChatMessage = {
-        ...message,
-        status: message.status ?? "sent",
-      };
+    const onMessage = (message: IncomingMessage) => {
+      enqueue(message);
+    };
 
-      if (normalizedMessage.clientTempId) {
-        updateMessage(normalizedMessage.clientTempId, normalizedMessage);
-      }
-
-      appendMessage(normalizedMessage);
-    });
-
-    // ERROR HANDLING
-    socket.on("connect_error", (err) => {
+    const onError = (err: Error) => {
       console.error("Socket error:", err.message);
 
       if (err.message === "Unauthorized") {
-        if (isMounted) {
-          markSocketConnected(false);
-        }
+        markSocketConnected(false);
         useAuthStore.getState().clearAuth();
       }
-    });
+    };
 
+    socket.on("connect", onConnect);
+    socket.on("disconnect", onDisconnect);
+    socket.on("receive_message", onMessage);
+    socket.on("connect_error", onError);
+
+    connectSocket();
 
     return () => {
-      isMounted = false;
-      socket.off("connect");
-      socket.off("disconnect");
-      socket.off("receive_message");
-      socket.off("connect_error");
+      socket.off("connect", onConnect);
+      socket.off("disconnect", onDisconnect);
+      socket.off("receive_message", onMessage);
+      socket.off("connect_error", onError);
     };
-  }, [appendMessage, updateMessage, markSocketConnected]);
+  }, [userId, enqueue, markSocketConnected]);
 };

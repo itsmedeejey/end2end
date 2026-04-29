@@ -75,6 +75,7 @@ export default function Chat() {
     return () => el.removeEventListener("scroll", handleScroll);
   }, []);
 
+  //FIX: check this later
   // Poll messages only when socket is disconnected.
   useEffect(() => {
     if (!conversationId || socketConnected) return;
