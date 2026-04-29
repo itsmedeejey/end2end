@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards, Req } from '@nestjs/common';
+import { Body, Controller, Post, Get, UseGuards, Req } from '@nestjs/common';
 
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { KeysService } from './keys.service';
@@ -23,8 +23,20 @@ export class KeysController {
     }
 
     return await this.keyService.storePublickey(keyBundle, req.user.sub)
+  }
+
+
+  @Get('getKeys')
+  @UseGuards(JwtAuthGuard)
+  async getKeys(@Req() req: Request & { user: JwtPayload }) {
+    const keys = await this.keyService.getPublicKeys(req.user.sub)
+
+    return keys;
 
   }
+
+
+
 
 
 }

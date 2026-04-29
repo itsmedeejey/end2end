@@ -58,7 +58,26 @@ export class KeysService {
 
       throw new InternalServerErrorException("Could not register device keys");
     }
+
+
   }
+
+
+
+
+  async getPublicKeys(userId: string) {
+
+
+
+    return userId;
+
+  }
+
+
+
+
+
+
 }
 
 
