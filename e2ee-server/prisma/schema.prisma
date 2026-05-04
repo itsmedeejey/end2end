@@ -46,7 +46,6 @@ model User {
 }
 
 // CONVERSATIONS (DIRECT ONLY)
-
 model Conversation {
   id String @id @default(uuid())
 

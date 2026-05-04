@@ -1,6 +1,6 @@
 import { getAddress } from "../address";
 import type { StorageType } from "@privacyresearch/libsignal-protocol-typescript";
-
+import { fetchPreKeyBundle } from "../utils/fetchPreKeyBundle";
 import { createSession } from "../sessionManager";
 
 export async function ensureSession(
@@ -14,7 +14,6 @@ export async function ensureSession(
   if (existing) return;
 
   // fetch from backend
-  //TODO: fetchPreKeyBundle from server
   const bundle = await fetchPreKeyBundle(receiverId);
 
   await createSession(store, receiverId, bundle);

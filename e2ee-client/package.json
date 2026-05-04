@@ -10,7 +10,7 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@privacyresearch/libsignal-protocol-typescript": "^0.0.16",
+    "@privacyresearch/libsignal-protocol-typescript": "github:itsmedeejey/libsignal-protocol-typescript#main",
     "axios": "^1.13.6",
     "idb": "^8.0.3",
     "next": "16.2.1",
