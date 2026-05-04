@@ -1,10 +1,17 @@
-import { Body, Controller, Post, UseGuards, Req } from '@nestjs/common';
+import { Body, Controller, Post, Get, UseGuards, Req, UsePipes, Param } from '@nestjs/common';
 
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { KeysService } from './keys.service';
 import { KeyBundleDto, } from './dto/keybundle.dto';
 import { GetKeysDto } from './dto/getKeys.dto';
 import { JwtPayload } from '../auth/types/jwt-payload.type';
+import { ValidationPipe } from '@nestjs/common';
+
+@UsePipes(new ValidationPipe({
+  whitelist: true,
+  forbidNonWhitelisted: true,
+  transform: true
+}))
 
 @Controller('keys')
 export class KeysController {
@@ -28,12 +35,12 @@ export class KeysController {
 
 
   //get preKeys for the user
-  @Post('getKeys')
+  @Get(':receiverId')
   @UseGuards(JwtAuthGuard)
   async getKeys(
-    @Body() dto: GetKeysDto) {
-    const recieverId = dto.recieverId
-    const keys = await this.keyService.getPublicKeys(recieverId)
+    @Param() dto: GetKeysDto) {
+    const receiverId = dto.receiverId
+    const keys = await this.keyService.getPublicKeys(receiverId)
     return keys;
   }
 

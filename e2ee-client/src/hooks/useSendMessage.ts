@@ -51,17 +51,17 @@ export const useSendMessage = () => {
     }
 
     try {
-      //  1. ensure session
+      //   ensure session
       await ensureSession(store, payload.receiverId);
 
-      //  2. encrypt
+      //   encrypt
       const encrypted = await encryptMessage(
         store,
         payload.receiverId,
         payload.content
       );
 
-      //  3. send encrypted
+      //   send encrypted
       socket.emit(
         "send_message",
         {

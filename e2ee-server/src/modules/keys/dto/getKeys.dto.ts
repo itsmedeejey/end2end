@@ -7,5 +7,5 @@ import {
 export class GetKeysDto {
   @IsString()
   @IsNotEmpty()
-  recieverId: string;
+  receiverId: string;
 }

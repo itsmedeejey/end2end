@@ -31,10 +31,9 @@ type PreKeyBundle = {
   };
 };
 
-export const fetchPreKeyBundle = async (recieverId: string) => {
-  const res = await api.post<fetchKeyBundle>("api/keys/getKeys", { recieverId: recieverId })
+export const fetchPreKeyBundle = async (receiverId: string) => {
+  const res = await api.get<fetchKeyBundle>(`api/keys/${receiverId}`)
   const keys = res.data;
-
 
   let preKey;
 

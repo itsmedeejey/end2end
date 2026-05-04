@@ -1,14 +1,20 @@
 import type { Response, Request } from "express"
-import { Controller, Post, Body, Res, Req, Get, UseGuards } from '@nestjs/common'
+import { Controller, Post, Body, Res, Req, Get, UseGuards, UsePipes } from '@nestjs/common'
 import { RegisterUserDto } from './dto/registerUser.dto'
 import { LoginUserDto } from './dto/loginUser.dto'
 import { AuthService } from './auth.service'
 import { JwtAuthGuard } from "./jwt-auth.guard"
-
+import { ValidationPipe } from "@nestjs/common"
 type Tokens = {
   accessToken: string;
   refreshToken: string;
 };
+
+@UsePipes(new ValidationPipe({
+  whitelist: true,
+  forbidNonWhitelisted: true,
+  transform: true
+}))
 
 @Controller('auth')
 export class AuthController {

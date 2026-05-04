@@ -7,14 +7,21 @@ export async function ensureSession(
   store: StorageType,
   receiverId: string
 ) {
-  const address = getAddress(receiverId);
+  try {
 
-  const existing = await store.loadSession(address.toString());
+    const address = getAddress(receiverId);
 
-  if (existing) return;
+    const existing = await store.loadSession(address.toString());
 
-  // fetch from backend
-  const bundle = await fetchPreKeyBundle(receiverId);
+    if (existing) return;
 
-  await createSession(store, receiverId, bundle);
+    // fetch from backend
+    const bundle = await fetchPreKeyBundle(receiverId);
+
+    await createSession(store, receiverId, bundle);
+
+  } catch (error) {
+    console.log(error)
+    return
+  }
 }

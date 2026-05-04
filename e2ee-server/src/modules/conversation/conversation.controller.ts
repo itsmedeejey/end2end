@@ -6,6 +6,7 @@ import {
   Query,
   Req,
   UseGuards,
+  UsePipes
 } from '@nestjs/common';
 import type { Request } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -15,7 +16,14 @@ import { JwtPayload } from '../auth/types/jwt-payload.type';
 import { FindOrCreateConversationResponse } from './types/findOrCreateConversationResponse.type';
 import { GetConversationsResponse } from './types/getConversationsResponse.type';
 import { GetChatsResponse } from './types/getChatsResponse.type';
+import { ValidationPipe } from '@nestjs/common';
 
+
+@UsePipes(new ValidationPipe({
+  whitelist: true,
+  forbidNonWhitelisted: true,
+  transform: true
+}))
 
 @Controller('conversation')
 export class ConversationController {
