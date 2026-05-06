@@ -4,55 +4,147 @@ import { useEffect } from "react";
 import { getSocket } from "@/lib/socket/socket";
 import { useChatStore } from "@/store/chat.store";
 import { useAuthStore } from "@/store/auth.store";
+import { ensureSession } from "@/lib/libsodium/services/ensureSession";
+import { decryptMessage } from "@/lib/libsodium/decrypt";
 import { ChatMessage } from "@/types/message.type";
 
+
+type IncomingEncryptedMessage = {
+  id: string;
+  conversationId: string;
+  senderId: string;
+  ciphertext: string;
+  nonce: string;
+  createdAt: string;
+  clientTempId?: string;
+  status?:
+  | "sending"
+  | "sent"
+  | "delivered"
+  | "read"
+  | "failed";
+};
+
+
 export const useSocketConnection = () => {
+
   const appendMessage = useChatStore((s) => s.appendMessage);
   const updateMessage = useChatStore((s) => s.updateMessage);
   const markSocketConnected = useChatStore((s) => s.markSocketConnected);
+  const conversations = useChatStore((s) => s.conversations)
+
+
+  const currentUserId = useAuthStore.getState().uniqueUserId;
 
   useEffect(() => {
+
     let isMounted = true;
     const socket = getSocket();
 
-    // CONNECT
     socket.on("connect", () => {
-      console.log("Socket connected:", socket.id);
-      if (isMounted) markSocketConnected(true);
+      console.log(
+        "Socket connected:",
+        socket.id
+      );
+
+      if (isMounted) {
+        markSocketConnected(true);
+      }
     });
 
-    // DISCONNECT
+
     socket.on("disconnect", () => {
       console.log("Socket disconnected");
-      if (isMounted) markSocketConnected(false);
-    });
 
-    // RECEIVE MESSAGE
-    socket.on("receive_message", (message: ChatMessage) => {
-      const normalizedMessage: ChatMessage = {
-        ...message,
-        status: message.status ?? "sent",
-      };
-
-      if (normalizedMessage.clientTempId) {
-        updateMessage(normalizedMessage.clientTempId, normalizedMessage);
+      if (isMounted) {
+        markSocketConnected(false);
       }
-
-      appendMessage(normalizedMessage);
     });
 
-    // ERROR HANDLING
-    socket.on("connect_error", (err) => {
-      console.error("Socket error:", err.message);
+    socket.on(
+      "receive_message",
+      async (message: IncomingEncryptedMessage) => {
 
-      if (err.message === "Unauthorized") {
-        if (isMounted) {
-          markSocketConnected(false);
+        if (!currentUserId) return;
+
+        const activeConversation = conversations.find((c) => c.conversationId === message.conversationId);
+
+        const otherPeerUserId = activeConversation?.participant.uniqueUserId;
+
+        if (!otherPeerUserId) {
+          console.error(
+            "peer user id missing"
+          );
+          return;
         }
-        useAuthStore.getState().clearAuth();
-      }
-    });
+        const peerUserId = message.senderId === currentUserId ? otherPeerUserId : message.senderId;
 
+
+        try {
+          const sessionKey = await ensureSession(
+            message.conversationId,
+            peerUserId
+          );
+
+          const plaintext = await decryptMessage(
+            message.ciphertext,
+            message.nonce,
+            sessionKey
+          );
+
+
+          const normalizedMessage: ChatMessage = {
+            id: message.id,
+            conversationId: message.conversationId,
+            senderId: message.senderId,
+            content: plaintext,
+            nonce: message.nonce,
+            createdAt: message.createdAt,
+            clientTempId: message.clientTempId,
+            status: message.status ?? "sent",
+          };
+
+          if (normalizedMessage.clientTempId) {
+
+            updateMessage(
+              normalizedMessage.clientTempId,
+              normalizedMessage
+            );
+
+          } else {
+            appendMessage(normalizedMessage);
+          }
+
+        } catch (err) {
+
+          console.error(
+            "failed to decrypt incoming message",
+            err
+          );
+        }
+      }
+    );
+
+
+
+
+    socket.on(
+      "connect_error",
+      (err) => {
+
+        console.error(
+          "Socket error:",
+          err.message
+        );
+
+        if (err.message === "Unauthorized") {
+          if (isMounted) {
+            markSocketConnected(false);
+          }
+          useAuthStore.getState().clearAuth();
+        }
+      }
+    );
 
     return () => {
       isMounted = false;
@@ -61,5 +153,13 @@ export const useSocketConnection = () => {
       socket.off("receive_message");
       socket.off("connect_error");
     };
-  }, [appendMessage, updateMessage, markSocketConnected]);
+
+  },
+    [
+      currentUserId,
+      conversations,
+      appendMessage,
+      updateMessage,
+      markSocketConnected,
+    ]);
 };

@@ -90,8 +90,7 @@ export default function Chat() {
 
   // Auto-scroll on initial load / conversation switch / incoming new messages.
   useEffect(() => {
-    const hasConversationChanged =
-      previousConversationIdRef.current !== conversationId;
+    const hasConversationChanged = previousConversationIdRef.current !== conversationId;
     const hasNewMessage = messages.length > previousMessageCountRef.current;
 
     if (hasConversationChanged) {
@@ -129,7 +128,7 @@ export default function Chat() {
           return (
             <ChatUi
               key={message.id}
-              content={message.ciphertext}
+              content={message.content}
               type={isSent ? "sent" : "received"}
             />
           );

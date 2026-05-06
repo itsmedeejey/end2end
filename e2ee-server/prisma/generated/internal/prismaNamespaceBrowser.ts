@@ -17,8 +17,8 @@
 
 import * as runtime from "@prisma/client/runtime/index-browser"
 
-export type * from '../models'
-export type * from './prismaNamespace'
+export type * from '../models.js'
+export type * from './prismaNamespace.js'
 
 export const Decimal = runtime.Decimal
 
@@ -56,8 +56,6 @@ export const ModelName = {
   ConversationMember: 'ConversationMember',
   Message: 'Message',
   UserIdentityKey: 'UserIdentityKey',
-  UserSignedPreKey: 'UserSignedPreKey',
-  UserOneTimePreKey: 'UserOneTimePreKey',
   RefreshToken: 'RefreshToken'
 } as const
 
@@ -115,10 +113,9 @@ export const MessageScalarFieldEnum = {
   conversationId: 'conversationId',
   senderId: 'senderId',
   ciphertext: 'ciphertext',
+  nonce: 'nonce',
   messageType: 'messageType',
   status: 'status',
-  protocolVersion: 'protocolVersion',
-  isPreKeyMessage: 'isPreKeyMessage',
   createdAt: 'createdAt',
   deliveredAt: 'deliveredAt',
   seenAt: 'seenAt'
@@ -130,41 +127,12 @@ export type MessageScalarFieldEnum = (typeof MessageScalarFieldEnum)[keyof typeo
 export const UserIdentityKeyScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
-  registrationId: 'registrationId',
   publicKey: 'publicKey',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type UserIdentityKeyScalarFieldEnum = (typeof UserIdentityKeyScalarFieldEnum)[keyof typeof UserIdentityKeyScalarFieldEnum]
-
-
-export const UserSignedPreKeyScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  keyId: 'keyId',
-  publicKey: 'publicKey',
-  signature: 'signature',
-  isActive: 'isActive',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  expiresAt: 'expiresAt'
-} as const
-
-export type UserSignedPreKeyScalarFieldEnum = (typeof UserSignedPreKeyScalarFieldEnum)[keyof typeof UserSignedPreKeyScalarFieldEnum]
-
-
-export const UserOneTimePreKeyScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  keyId: 'keyId',
-  publicKey: 'publicKey',
-  isUsed: 'isUsed',
-  usedAt: 'usedAt',
-  createdAt: 'createdAt'
-} as const
-
-export type UserOneTimePreKeyScalarFieldEnum = (typeof UserOneTimePreKeyScalarFieldEnum)[keyof typeof UserOneTimePreKeyScalarFieldEnum]
 
 
 export const RefreshTokenScalarFieldEnum = {
