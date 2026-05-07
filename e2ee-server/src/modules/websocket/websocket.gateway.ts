@@ -166,7 +166,7 @@ export class WebsocketGateway
       ...message,
       createdAt: serverCreatedAt,
       status: 'sent',
-      clientTempId,
+      //clientTempId,
     });
 
     return {

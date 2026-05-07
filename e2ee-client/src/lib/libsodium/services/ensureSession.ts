@@ -13,7 +13,10 @@ export async function ensureSession(
 
   try {
     let sessionKey = await getSessionKey(conversationId)
+    console.log("sessionKey from store", sessionKey)
     if (sessionKey) return sessionKey;
+    console.log("what it returns", sessionKey)
+
 
     const response = await api.get(`/api/keys/${receiverId}`);
     const ReceiverPubKey = response.data.publicKey;

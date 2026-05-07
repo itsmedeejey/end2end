@@ -19,7 +19,7 @@ export const useSendMessage = () => {
   const appendMessage = useChatStore((s) => s.appendMessage);
   const updateMessage = useChatStore((s) => s.updateMessage);
 
-  const userId = useAuthStore((s) => s.userId);
+  const userId = useAuthStore((s) => s.uniqueUserId);
   const status = useAuthStore((s) => s.status);
 
   const sendMessage = async (payload: SendMessagePayload) => {
@@ -49,7 +49,6 @@ export const useSendMessage = () => {
       updateMessage(tempId, { status: "failed" });
       return;
     }
-
 
     try {
       const sessionKey = await ensureSession(payload.conversationId, payload.receiverId)

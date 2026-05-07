@@ -15,11 +15,15 @@ export async function decryptMessage(
     sodium.base64_variants.ORIGINAL
   );
 
+
+  console.log("sessionKeyBase64", sessionKeyBase64)
   const key = sodium.from_base64(
     sessionKeyBase64,
     sodium.base64_variants.ORIGINAL
   );
 
+  console.log("key", key)
+  console.log(key.length)
   const plaintext =
     sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(
       null,

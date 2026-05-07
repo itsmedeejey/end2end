@@ -9,11 +9,18 @@ export class KeysService {
 
   async storePublickey(publicKey: string, userId: string) {
     try {
-      await this.prisma.userIdentityKey.create({
-        data: {
+      await this.prisma.userIdentityKey.upsert({
+        where: {
+          userId: userId
+        },
+        update: {
+          publicKey: publicKey
+        },
+        create: {
           userId: userId,
           publicKey: publicKey
         }
+
       });
       return { success: true };
     } catch (err) {
@@ -29,7 +36,6 @@ export class KeysService {
   async getPublicKeys(userUniqueId: string) {
 
     try {
-
       const userId = await this.prisma.user.findUnique({ where: { uniqueUserId: userUniqueId }, select: { id: true } })
       if (userId) {
 

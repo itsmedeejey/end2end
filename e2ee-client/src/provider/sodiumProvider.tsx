@@ -7,6 +7,7 @@ export default function SodiumProvider({
 }: {
   children: React.ReactNode;
 }) {
+
   useInitSodium();
 
   return <>{children}</>;

@@ -3,14 +3,17 @@ import { generateIdentityKeys } from "@/lib/libsodium/identity"
 import api from "@/config/axios"
 import { useEffect } from "react"
 import { getIdentityKeys } from "@/lib/libsodium/store/sodiumStore"
+import { useRef } from "react"
 
 export const useInitSodium = () => {
+  const initializedRef = useRef(false)
 
   useEffect(() => {
+    if (initializedRef.current) { return; }
+    initializedRef.current = true;
     const init = async () => {
 
       try {
-
         const identity = await getIdentityKeys();
 
         if (!identity?.publicKey || !identity.privateKey) {

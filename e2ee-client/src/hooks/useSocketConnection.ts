@@ -79,6 +79,11 @@ export const useSocketConnection = () => {
         }
         const peerUserId = message.senderId === currentUserId ? otherPeerUserId : message.senderId;
 
+        console.log("currentUserId", currentUserId)
+        console.log("otherPeerUserId", otherPeerUserId)
+        console.log("peerUserId", peerUserId)
+        console.log("senderId", message.senderId)
+
 
         try {
           const sessionKey = await ensureSession(
@@ -92,6 +97,8 @@ export const useSocketConnection = () => {
             sessionKey
           );
 
+          console.log("decryptMessage", plaintext)
+
 
           const normalizedMessage: ChatMessage = {
             id: message.id,
@@ -103,6 +110,8 @@ export const useSocketConnection = () => {
             clientTempId: message.clientTempId,
             status: message.status ?? "sent",
           };
+
+          console.log("normalizedMessage:", normalizedMessage)
 
           if (normalizedMessage.clientTempId) {
 

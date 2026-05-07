@@ -19,7 +19,7 @@ export default function Chat() {
   const loadMessages = useChatStore((s) => s.loadMessages);
   const setActiveConversationId = useChatStore((s) => s.setActiveConversationId);
   const socketConnected = useChatStore((s) => s.socketConnected);
-  const currentUserId = useAuthStore((s) => s.userId);
+  const currentUserId = useAuthStore((s) => s.uniqueUserId);
 
   const { joinConversation, leaveConversation } = useChatSocket();
 
@@ -56,11 +56,14 @@ export default function Chat() {
     (c) => c.conversationId === conversationId
   );
 
+
   const messages = useMemo(
     () => (conversationId ? messagesByConversation[conversationId] || [] : []),
     [conversationId, messagesByConversation]
   );
 
+
+  // auto scrol to bottom
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
@@ -75,6 +78,8 @@ export default function Chat() {
     return () => el.removeEventListener("scroll", handleScroll);
   }, []);
 
+
+
   // Poll messages only when socket is disconnected.
   useEffect(() => {
     if (!conversationId || socketConnected) return;
@@ -87,6 +92,7 @@ export default function Chat() {
       window.clearInterval(intervalId);
     };
   }, [conversationId, socketConnected, loadMessages]);
+
 
   // Auto-scroll on initial load / conversation switch / incoming new messages.
   useEffect(() => {
@@ -111,6 +117,7 @@ export default function Chat() {
     previousMessageCountRef.current = messages.length;
   }, [conversationId, messages.length]);
 
+
   if (!conversationId) return null;
 
   return (
@@ -121,6 +128,7 @@ export default function Chat() {
 
       <div ref={scrollRef} className="flex-1 overflow-y-scroll">
         {messages.map((message) => {
+          console.log(message)
           const isSent = currentUserId
             ? message.senderId === currentUserId
             : false;
@@ -133,6 +141,7 @@ export default function Chat() {
             />
           );
         })}
+
         <div ref={bottomRef} />
       </div>
 
