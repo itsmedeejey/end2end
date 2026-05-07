@@ -6,7 +6,11 @@ export class SendMessageDto {
 
   @IsString()
   @MinLength(1)
-  content: string;
+  cipherText: string;
+
+  @IsString()
+  @MinLength(1)
+  nonce: string;
 
   @IsString()
   @MinLength(1)

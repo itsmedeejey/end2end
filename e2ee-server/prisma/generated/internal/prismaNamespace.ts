@@ -16,10 +16,10 @@
  */
 
 import * as runtime from "@prisma/client/runtime/client"
-import type * as Prisma from "../models"
-import { type PrismaClient } from "./class"
+import type * as Prisma from "../models.js"
+import { type PrismaClient } from "./class.js"
 
-export type * from '../models'
+export type * from '../models.js'
 
 export type DMMF = typeof runtime.DMMF
 
@@ -389,8 +389,6 @@ export const ModelName = {
   ConversationMember: 'ConversationMember',
   Message: 'Message',
   UserIdentityKey: 'UserIdentityKey',
-  UserSignedPreKey: 'UserSignedPreKey',
-  UserOneTimePreKey: 'UserOneTimePreKey',
   RefreshToken: 'RefreshToken'
 } as const
 
@@ -407,7 +405,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "conversation" | "conversationMember" | "message" | "userIdentityKey" | "userSignedPreKey" | "userOneTimePreKey" | "refreshToken"
+    modelProps: "user" | "conversation" | "conversationMember" | "message" | "userIdentityKey" | "refreshToken"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -781,154 +779,6 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    UserSignedPreKey: {
-      payload: Prisma.$UserSignedPreKeyPayload<ExtArgs>
-      fields: Prisma.UserSignedPreKeyFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.UserSignedPreKeyFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSignedPreKeyPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.UserSignedPreKeyFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSignedPreKeyPayload>
-        }
-        findFirst: {
-          args: Prisma.UserSignedPreKeyFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSignedPreKeyPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.UserSignedPreKeyFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSignedPreKeyPayload>
-        }
-        findMany: {
-          args: Prisma.UserSignedPreKeyFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSignedPreKeyPayload>[]
-        }
-        create: {
-          args: Prisma.UserSignedPreKeyCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSignedPreKeyPayload>
-        }
-        createMany: {
-          args: Prisma.UserSignedPreKeyCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.UserSignedPreKeyCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSignedPreKeyPayload>[]
-        }
-        delete: {
-          args: Prisma.UserSignedPreKeyDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSignedPreKeyPayload>
-        }
-        update: {
-          args: Prisma.UserSignedPreKeyUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSignedPreKeyPayload>
-        }
-        deleteMany: {
-          args: Prisma.UserSignedPreKeyDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.UserSignedPreKeyUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.UserSignedPreKeyUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSignedPreKeyPayload>[]
-        }
-        upsert: {
-          args: Prisma.UserSignedPreKeyUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSignedPreKeyPayload>
-        }
-        aggregate: {
-          args: Prisma.UserSignedPreKeyAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateUserSignedPreKey>
-        }
-        groupBy: {
-          args: Prisma.UserSignedPreKeyGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.UserSignedPreKeyGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.UserSignedPreKeyCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.UserSignedPreKeyCountAggregateOutputType> | number
-        }
-      }
-    }
-    UserOneTimePreKey: {
-      payload: Prisma.$UserOneTimePreKeyPayload<ExtArgs>
-      fields: Prisma.UserOneTimePreKeyFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.UserOneTimePreKeyFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserOneTimePreKeyPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.UserOneTimePreKeyFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserOneTimePreKeyPayload>
-        }
-        findFirst: {
-          args: Prisma.UserOneTimePreKeyFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserOneTimePreKeyPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.UserOneTimePreKeyFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserOneTimePreKeyPayload>
-        }
-        findMany: {
-          args: Prisma.UserOneTimePreKeyFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserOneTimePreKeyPayload>[]
-        }
-        create: {
-          args: Prisma.UserOneTimePreKeyCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserOneTimePreKeyPayload>
-        }
-        createMany: {
-          args: Prisma.UserOneTimePreKeyCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.UserOneTimePreKeyCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserOneTimePreKeyPayload>[]
-        }
-        delete: {
-          args: Prisma.UserOneTimePreKeyDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserOneTimePreKeyPayload>
-        }
-        update: {
-          args: Prisma.UserOneTimePreKeyUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserOneTimePreKeyPayload>
-        }
-        deleteMany: {
-          args: Prisma.UserOneTimePreKeyDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.UserOneTimePreKeyUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.UserOneTimePreKeyUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserOneTimePreKeyPayload>[]
-        }
-        upsert: {
-          args: Prisma.UserOneTimePreKeyUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserOneTimePreKeyPayload>
-        }
-        aggregate: {
-          args: Prisma.UserOneTimePreKeyAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateUserOneTimePreKey>
-        }
-        groupBy: {
-          args: Prisma.UserOneTimePreKeyGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.UserOneTimePreKeyGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.UserOneTimePreKeyCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.UserOneTimePreKeyCountAggregateOutputType> | number
-        }
-      }
-    }
     RefreshToken: {
       payload: Prisma.$RefreshTokenPayload<ExtArgs>
       fields: Prisma.RefreshTokenFieldRefs
@@ -1080,10 +930,9 @@ export const MessageScalarFieldEnum = {
   conversationId: 'conversationId',
   senderId: 'senderId',
   ciphertext: 'ciphertext',
+  nonce: 'nonce',
   messageType: 'messageType',
   status: 'status',
-  protocolVersion: 'protocolVersion',
-  isPreKeyMessage: 'isPreKeyMessage',
   createdAt: 'createdAt',
   deliveredAt: 'deliveredAt',
   seenAt: 'seenAt'
@@ -1095,41 +944,12 @@ export type MessageScalarFieldEnum = (typeof MessageScalarFieldEnum)[keyof typeo
 export const UserIdentityKeyScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
-  registrationId: 'registrationId',
   publicKey: 'publicKey',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type UserIdentityKeyScalarFieldEnum = (typeof UserIdentityKeyScalarFieldEnum)[keyof typeof UserIdentityKeyScalarFieldEnum]
-
-
-export const UserSignedPreKeyScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  keyId: 'keyId',
-  publicKey: 'publicKey',
-  signature: 'signature',
-  isActive: 'isActive',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  expiresAt: 'expiresAt'
-} as const
-
-export type UserSignedPreKeyScalarFieldEnum = (typeof UserSignedPreKeyScalarFieldEnum)[keyof typeof UserSignedPreKeyScalarFieldEnum]
-
-
-export const UserOneTimePreKeyScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  keyId: 'keyId',
-  publicKey: 'publicKey',
-  isUsed: 'isUsed',
-  usedAt: 'usedAt',
-  createdAt: 'createdAt'
-} as const
-
-export type UserOneTimePreKeyScalarFieldEnum = (typeof UserOneTimePreKeyScalarFieldEnum)[keyof typeof UserOneTimePreKeyScalarFieldEnum]
 
 
 export const RefreshTokenScalarFieldEnum = {
@@ -1232,13 +1052,6 @@ export type ListEnumMessageStatusFieldRefInput<$PrismaModel> = FieldRefInputType
 
 
 /**
- * Reference to a field of type 'Boolean'
- */
-export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
-    
-
-
-/**
  * Reference to a field of type 'Int'
  */
 export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
@@ -1249,20 +1062,6 @@ export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'In
  * Reference to a field of type 'Int[]'
  */
 export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
-    
-
-
-/**
- * Reference to a field of type 'Float'
- */
-export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
-    
-
-
-/**
- * Reference to a field of type 'Float[]'
- */
-export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
     
 
 /**
@@ -1365,8 +1164,6 @@ export type GlobalOmitConfig = {
   conversationMember?: Prisma.ConversationMemberOmit
   message?: Prisma.MessageOmit
   userIdentityKey?: Prisma.UserIdentityKeyOmit
-  userSignedPreKey?: Prisma.UserSignedPreKeyOmit
-  userOneTimePreKey?: Prisma.UserOneTimePreKeyOmit
   refreshToken?: Prisma.RefreshTokenOmit
 }
 

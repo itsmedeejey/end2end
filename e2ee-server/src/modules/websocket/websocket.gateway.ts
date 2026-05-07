@@ -128,9 +128,11 @@ export class WebsocketGateway
   ) {
     const user = this.getRequiredSocketUser(client);
     const userId = user.sub;
+    const userUniqueId = user.uid;
     const conversationId = data.conversationId;
-    const content = data.content;
+    const content = data.cipherText;
     const clientTempId = data.clientTempId;
+    const nonce = data.nonce;
 
 
     // 1. Check if user is part of conversation
@@ -149,12 +151,11 @@ export class WebsocketGateway
     const message = await this.prisma.message.create({
       data: {
         conversationId,
-        senderId: userId,
+        senderId: userUniqueId,
         messageType: MessageType.TEXT,
         status: MessageStatus.SENT,
-        protocolVersion: '1.0',
-        isPreKeyMessage: false,
         ciphertext: content,
+        nonce: nonce,
       },
     });
 
@@ -165,7 +166,7 @@ export class WebsocketGateway
       ...message,
       createdAt: serverCreatedAt,
       status: 'sent',
-      clientTempId,
+      //clientTempId,
     });
 
     return {

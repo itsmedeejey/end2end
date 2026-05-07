@@ -9,8 +9,8 @@
  * 🟢 You can import this file directly.
  */
 import type * as runtime from "@prisma/client/runtime/client"
-import type * as $Enums from "../enums"
-import type * as Prisma from "../internal/prismaNamespace"
+import type * as $Enums from "../enums.js"
+import type * as Prisma from "../internal/prismaNamespace.js"
 
 /**
  * Model User
@@ -200,8 +200,6 @@ export type UserWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   conversations?: Prisma.ConversationMemberListRelationFilter
   messages?: Prisma.MessageListRelationFilter
-  signedPreKeys?: Prisma.UserSignedPreKeyListRelationFilter
-  oneTimePreKeys?: Prisma.UserOneTimePreKeyListRelationFilter
   identityKey?: Prisma.XOR<Prisma.UserIdentityKeyNullableScalarRelationFilter, Prisma.UserIdentityKeyWhereInput> | null
   refreshTokens?: Prisma.RefreshTokenListRelationFilter
 }
@@ -216,8 +214,6 @@ export type UserOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   conversations?: Prisma.ConversationMemberOrderByRelationAggregateInput
   messages?: Prisma.MessageOrderByRelationAggregateInput
-  signedPreKeys?: Prisma.UserSignedPreKeyOrderByRelationAggregateInput
-  oneTimePreKeys?: Prisma.UserOneTimePreKeyOrderByRelationAggregateInput
   identityKey?: Prisma.UserIdentityKeyOrderByWithRelationInput
   refreshTokens?: Prisma.RefreshTokenOrderByRelationAggregateInput
 }
@@ -235,8 +231,6 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   conversations?: Prisma.ConversationMemberListRelationFilter
   messages?: Prisma.MessageListRelationFilter
-  signedPreKeys?: Prisma.UserSignedPreKeyListRelationFilter
-  oneTimePreKeys?: Prisma.UserOneTimePreKeyListRelationFilter
   identityKey?: Prisma.XOR<Prisma.UserIdentityKeyNullableScalarRelationFilter, Prisma.UserIdentityKeyWhereInput> | null
   refreshTokens?: Prisma.RefreshTokenListRelationFilter
 }, "id" | "uniqueUserId" | "recoveryKeyFingerprint">
@@ -277,8 +271,6 @@ export type UserCreateInput = {
   updatedAt?: Date | string
   conversations?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
   messages?: Prisma.MessageCreateNestedManyWithoutSenderInput
-  signedPreKeys?: Prisma.UserSignedPreKeyCreateNestedManyWithoutUserInput
-  oneTimePreKeys?: Prisma.UserOneTimePreKeyCreateNestedManyWithoutUserInput
   identityKey?: Prisma.UserIdentityKeyCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
 }
@@ -293,8 +285,6 @@ export type UserUncheckedCreateInput = {
   updatedAt?: Date | string
   conversations?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
-  signedPreKeys?: Prisma.UserSignedPreKeyUncheckedCreateNestedManyWithoutUserInput
-  oneTimePreKeys?: Prisma.UserOneTimePreKeyUncheckedCreateNestedManyWithoutUserInput
   identityKey?: Prisma.UserIdentityKeyUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
 }
@@ -309,8 +299,6 @@ export type UserUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   conversations?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
   messages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
-  signedPreKeys?: Prisma.UserSignedPreKeyUpdateManyWithoutUserNestedInput
-  oneTimePreKeys?: Prisma.UserOneTimePreKeyUpdateManyWithoutUserNestedInput
   identityKey?: Prisma.UserIdentityKeyUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
 }
@@ -325,8 +313,6 @@ export type UserUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   conversations?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
-  signedPreKeys?: Prisma.UserSignedPreKeyUncheckedUpdateManyWithoutUserNestedInput
-  oneTimePreKeys?: Prisma.UserOneTimePreKeyUncheckedUpdateManyWithoutUserNestedInput
   identityKey?: Prisma.UserIdentityKeyUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -446,34 +432,6 @@ export type UserUpdateOneRequiredWithoutIdentityKeyNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutIdentityKeyInput, Prisma.UserUpdateWithoutIdentityKeyInput>, Prisma.UserUncheckedUpdateWithoutIdentityKeyInput>
 }
 
-export type UserCreateNestedOneWithoutSignedPreKeysInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutSignedPreKeysInput, Prisma.UserUncheckedCreateWithoutSignedPreKeysInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSignedPreKeysInput
-  connect?: Prisma.UserWhereUniqueInput
-}
-
-export type UserUpdateOneRequiredWithoutSignedPreKeysNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutSignedPreKeysInput, Prisma.UserUncheckedCreateWithoutSignedPreKeysInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSignedPreKeysInput
-  upsert?: Prisma.UserUpsertWithoutSignedPreKeysInput
-  connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSignedPreKeysInput, Prisma.UserUpdateWithoutSignedPreKeysInput>, Prisma.UserUncheckedUpdateWithoutSignedPreKeysInput>
-}
-
-export type UserCreateNestedOneWithoutOneTimePreKeysInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutOneTimePreKeysInput, Prisma.UserUncheckedCreateWithoutOneTimePreKeysInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutOneTimePreKeysInput
-  connect?: Prisma.UserWhereUniqueInput
-}
-
-export type UserUpdateOneRequiredWithoutOneTimePreKeysNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutOneTimePreKeysInput, Prisma.UserUncheckedCreateWithoutOneTimePreKeysInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutOneTimePreKeysInput
-  upsert?: Prisma.UserUpsertWithoutOneTimePreKeysInput
-  connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutOneTimePreKeysInput, Prisma.UserUpdateWithoutOneTimePreKeysInput>, Prisma.UserUncheckedUpdateWithoutOneTimePreKeysInput>
-}
-
 export type UserCreateNestedOneWithoutRefreshTokensInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutRefreshTokensInput, Prisma.UserUncheckedCreateWithoutRefreshTokensInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutRefreshTokensInput
@@ -497,8 +455,6 @@ export type UserCreateWithoutConversationsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   messages?: Prisma.MessageCreateNestedManyWithoutSenderInput
-  signedPreKeys?: Prisma.UserSignedPreKeyCreateNestedManyWithoutUserInput
-  oneTimePreKeys?: Prisma.UserOneTimePreKeyCreateNestedManyWithoutUserInput
   identityKey?: Prisma.UserIdentityKeyCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
 }
@@ -512,8 +468,6 @@ export type UserUncheckedCreateWithoutConversationsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
-  signedPreKeys?: Prisma.UserSignedPreKeyUncheckedCreateNestedManyWithoutUserInput
-  oneTimePreKeys?: Prisma.UserOneTimePreKeyUncheckedCreateNestedManyWithoutUserInput
   identityKey?: Prisma.UserIdentityKeyUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
 }
@@ -543,8 +497,6 @@ export type UserUpdateWithoutConversationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   messages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
-  signedPreKeys?: Prisma.UserSignedPreKeyUpdateManyWithoutUserNestedInput
-  oneTimePreKeys?: Prisma.UserOneTimePreKeyUpdateManyWithoutUserNestedInput
   identityKey?: Prisma.UserIdentityKeyUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
 }
@@ -558,8 +510,6 @@ export type UserUncheckedUpdateWithoutConversationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   messages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
-  signedPreKeys?: Prisma.UserSignedPreKeyUncheckedUpdateManyWithoutUserNestedInput
-  oneTimePreKeys?: Prisma.UserOneTimePreKeyUncheckedUpdateManyWithoutUserNestedInput
   identityKey?: Prisma.UserIdentityKeyUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -573,8 +523,6 @@ export type UserCreateWithoutMessagesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   conversations?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
-  signedPreKeys?: Prisma.UserSignedPreKeyCreateNestedManyWithoutUserInput
-  oneTimePreKeys?: Prisma.UserOneTimePreKeyCreateNestedManyWithoutUserInput
   identityKey?: Prisma.UserIdentityKeyCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
 }
@@ -588,8 +536,6 @@ export type UserUncheckedCreateWithoutMessagesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   conversations?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
-  signedPreKeys?: Prisma.UserSignedPreKeyUncheckedCreateNestedManyWithoutUserInput
-  oneTimePreKeys?: Prisma.UserOneTimePreKeyUncheckedCreateNestedManyWithoutUserInput
   identityKey?: Prisma.UserIdentityKeyUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
 }
@@ -619,8 +565,6 @@ export type UserUpdateWithoutMessagesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   conversations?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
-  signedPreKeys?: Prisma.UserSignedPreKeyUpdateManyWithoutUserNestedInput
-  oneTimePreKeys?: Prisma.UserOneTimePreKeyUpdateManyWithoutUserNestedInput
   identityKey?: Prisma.UserIdentityKeyUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
 }
@@ -634,8 +578,6 @@ export type UserUncheckedUpdateWithoutMessagesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   conversations?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
-  signedPreKeys?: Prisma.UserSignedPreKeyUncheckedUpdateManyWithoutUserNestedInput
-  oneTimePreKeys?: Prisma.UserOneTimePreKeyUncheckedUpdateManyWithoutUserNestedInput
   identityKey?: Prisma.UserIdentityKeyUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -650,8 +592,6 @@ export type UserCreateWithoutIdentityKeyInput = {
   updatedAt?: Date | string
   conversations?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
   messages?: Prisma.MessageCreateNestedManyWithoutSenderInput
-  signedPreKeys?: Prisma.UserSignedPreKeyCreateNestedManyWithoutUserInput
-  oneTimePreKeys?: Prisma.UserOneTimePreKeyCreateNestedManyWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
 }
 
@@ -665,8 +605,6 @@ export type UserUncheckedCreateWithoutIdentityKeyInput = {
   updatedAt?: Date | string
   conversations?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
-  signedPreKeys?: Prisma.UserSignedPreKeyUncheckedCreateNestedManyWithoutUserInput
-  oneTimePreKeys?: Prisma.UserOneTimePreKeyUncheckedCreateNestedManyWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -696,8 +634,6 @@ export type UserUpdateWithoutIdentityKeyInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   conversations?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
   messages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
-  signedPreKeys?: Prisma.UserSignedPreKeyUpdateManyWithoutUserNestedInput
-  oneTimePreKeys?: Prisma.UserOneTimePreKeyUpdateManyWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
 }
 
@@ -711,160 +647,6 @@ export type UserUncheckedUpdateWithoutIdentityKeyInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   conversations?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
-  signedPreKeys?: Prisma.UserSignedPreKeyUncheckedUpdateManyWithoutUserNestedInput
-  oneTimePreKeys?: Prisma.UserOneTimePreKeyUncheckedUpdateManyWithoutUserNestedInput
-  refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
-}
-
-export type UserCreateWithoutSignedPreKeysInput = {
-  id?: string
-  displayName: string
-  uniqueUserId: string
-  recoveryKeyFingerprint: string
-  recoveryKeyHash: string
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  conversations?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
-  messages?: Prisma.MessageCreateNestedManyWithoutSenderInput
-  oneTimePreKeys?: Prisma.UserOneTimePreKeyCreateNestedManyWithoutUserInput
-  identityKey?: Prisma.UserIdentityKeyCreateNestedOneWithoutUserInput
-  refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
-}
-
-export type UserUncheckedCreateWithoutSignedPreKeysInput = {
-  id?: string
-  displayName: string
-  uniqueUserId: string
-  recoveryKeyFingerprint: string
-  recoveryKeyHash: string
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  conversations?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
-  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
-  oneTimePreKeys?: Prisma.UserOneTimePreKeyUncheckedCreateNestedManyWithoutUserInput
-  identityKey?: Prisma.UserIdentityKeyUncheckedCreateNestedOneWithoutUserInput
-  refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
-}
-
-export type UserCreateOrConnectWithoutSignedPreKeysInput = {
-  where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutSignedPreKeysInput, Prisma.UserUncheckedCreateWithoutSignedPreKeysInput>
-}
-
-export type UserUpsertWithoutSignedPreKeysInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutSignedPreKeysInput, Prisma.UserUncheckedUpdateWithoutSignedPreKeysInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutSignedPreKeysInput, Prisma.UserUncheckedCreateWithoutSignedPreKeysInput>
-  where?: Prisma.UserWhereInput
-}
-
-export type UserUpdateToOneWithWhereWithoutSignedPreKeysInput = {
-  where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutSignedPreKeysInput, Prisma.UserUncheckedUpdateWithoutSignedPreKeysInput>
-}
-
-export type UserUpdateWithoutSignedPreKeysInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  displayName?: Prisma.StringFieldUpdateOperationsInput | string
-  uniqueUserId?: Prisma.StringFieldUpdateOperationsInput | string
-  recoveryKeyFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
-  recoveryKeyHash?: Prisma.StringFieldUpdateOperationsInput | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  conversations?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
-  messages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
-  oneTimePreKeys?: Prisma.UserOneTimePreKeyUpdateManyWithoutUserNestedInput
-  identityKey?: Prisma.UserIdentityKeyUpdateOneWithoutUserNestedInput
-  refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
-}
-
-export type UserUncheckedUpdateWithoutSignedPreKeysInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  displayName?: Prisma.StringFieldUpdateOperationsInput | string
-  uniqueUserId?: Prisma.StringFieldUpdateOperationsInput | string
-  recoveryKeyFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
-  recoveryKeyHash?: Prisma.StringFieldUpdateOperationsInput | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  conversations?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
-  messages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
-  oneTimePreKeys?: Prisma.UserOneTimePreKeyUncheckedUpdateManyWithoutUserNestedInput
-  identityKey?: Prisma.UserIdentityKeyUncheckedUpdateOneWithoutUserNestedInput
-  refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
-}
-
-export type UserCreateWithoutOneTimePreKeysInput = {
-  id?: string
-  displayName: string
-  uniqueUserId: string
-  recoveryKeyFingerprint: string
-  recoveryKeyHash: string
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  conversations?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
-  messages?: Prisma.MessageCreateNestedManyWithoutSenderInput
-  signedPreKeys?: Prisma.UserSignedPreKeyCreateNestedManyWithoutUserInput
-  identityKey?: Prisma.UserIdentityKeyCreateNestedOneWithoutUserInput
-  refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
-}
-
-export type UserUncheckedCreateWithoutOneTimePreKeysInput = {
-  id?: string
-  displayName: string
-  uniqueUserId: string
-  recoveryKeyFingerprint: string
-  recoveryKeyHash: string
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  conversations?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
-  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
-  signedPreKeys?: Prisma.UserSignedPreKeyUncheckedCreateNestedManyWithoutUserInput
-  identityKey?: Prisma.UserIdentityKeyUncheckedCreateNestedOneWithoutUserInput
-  refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
-}
-
-export type UserCreateOrConnectWithoutOneTimePreKeysInput = {
-  where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutOneTimePreKeysInput, Prisma.UserUncheckedCreateWithoutOneTimePreKeysInput>
-}
-
-export type UserUpsertWithoutOneTimePreKeysInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutOneTimePreKeysInput, Prisma.UserUncheckedUpdateWithoutOneTimePreKeysInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutOneTimePreKeysInput, Prisma.UserUncheckedCreateWithoutOneTimePreKeysInput>
-  where?: Prisma.UserWhereInput
-}
-
-export type UserUpdateToOneWithWhereWithoutOneTimePreKeysInput = {
-  where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutOneTimePreKeysInput, Prisma.UserUncheckedUpdateWithoutOneTimePreKeysInput>
-}
-
-export type UserUpdateWithoutOneTimePreKeysInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  displayName?: Prisma.StringFieldUpdateOperationsInput | string
-  uniqueUserId?: Prisma.StringFieldUpdateOperationsInput | string
-  recoveryKeyFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
-  recoveryKeyHash?: Prisma.StringFieldUpdateOperationsInput | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  conversations?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
-  messages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
-  signedPreKeys?: Prisma.UserSignedPreKeyUpdateManyWithoutUserNestedInput
-  identityKey?: Prisma.UserIdentityKeyUpdateOneWithoutUserNestedInput
-  refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
-}
-
-export type UserUncheckedUpdateWithoutOneTimePreKeysInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  displayName?: Prisma.StringFieldUpdateOperationsInput | string
-  uniqueUserId?: Prisma.StringFieldUpdateOperationsInput | string
-  recoveryKeyFingerprint?: Prisma.StringFieldUpdateOperationsInput | string
-  recoveryKeyHash?: Prisma.StringFieldUpdateOperationsInput | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  conversations?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
-  messages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
-  signedPreKeys?: Prisma.UserSignedPreKeyUncheckedUpdateManyWithoutUserNestedInput
-  identityKey?: Prisma.UserIdentityKeyUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -878,8 +660,6 @@ export type UserCreateWithoutRefreshTokensInput = {
   updatedAt?: Date | string
   conversations?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
   messages?: Prisma.MessageCreateNestedManyWithoutSenderInput
-  signedPreKeys?: Prisma.UserSignedPreKeyCreateNestedManyWithoutUserInput
-  oneTimePreKeys?: Prisma.UserOneTimePreKeyCreateNestedManyWithoutUserInput
   identityKey?: Prisma.UserIdentityKeyCreateNestedOneWithoutUserInput
 }
 
@@ -893,8 +673,6 @@ export type UserUncheckedCreateWithoutRefreshTokensInput = {
   updatedAt?: Date | string
   conversations?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
-  signedPreKeys?: Prisma.UserSignedPreKeyUncheckedCreateNestedManyWithoutUserInput
-  oneTimePreKeys?: Prisma.UserOneTimePreKeyUncheckedCreateNestedManyWithoutUserInput
   identityKey?: Prisma.UserIdentityKeyUncheckedCreateNestedOneWithoutUserInput
 }
 
@@ -924,8 +702,6 @@ export type UserUpdateWithoutRefreshTokensInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   conversations?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
   messages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
-  signedPreKeys?: Prisma.UserSignedPreKeyUpdateManyWithoutUserNestedInput
-  oneTimePreKeys?: Prisma.UserOneTimePreKeyUpdateManyWithoutUserNestedInput
   identityKey?: Prisma.UserIdentityKeyUpdateOneWithoutUserNestedInput
 }
 
@@ -939,8 +715,6 @@ export type UserUncheckedUpdateWithoutRefreshTokensInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   conversations?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
   messages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
-  signedPreKeys?: Prisma.UserSignedPreKeyUncheckedUpdateManyWithoutUserNestedInput
-  oneTimePreKeys?: Prisma.UserOneTimePreKeyUncheckedUpdateManyWithoutUserNestedInput
   identityKey?: Prisma.UserIdentityKeyUncheckedUpdateOneWithoutUserNestedInput
 }
 
@@ -952,16 +726,12 @@ export type UserUncheckedUpdateWithoutRefreshTokensInput = {
 export type UserCountOutputType = {
   conversations: number
   messages: number
-  signedPreKeys: number
-  oneTimePreKeys: number
   refreshTokens: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   conversations?: boolean | UserCountOutputTypeCountConversationsArgs
   messages?: boolean | UserCountOutputTypeCountMessagesArgs
-  signedPreKeys?: boolean | UserCountOutputTypeCountSignedPreKeysArgs
-  oneTimePreKeys?: boolean | UserCountOutputTypeCountOneTimePreKeysArgs
   refreshTokens?: boolean | UserCountOutputTypeCountRefreshTokensArgs
 }
 
@@ -992,20 +762,6 @@ export type UserCountOutputTypeCountMessagesArgs<ExtArgs extends runtime.Types.E
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountSignedPreKeysArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.UserSignedPreKeyWhereInput
-}
-
-/**
- * UserCountOutputType without action
- */
-export type UserCountOutputTypeCountOneTimePreKeysArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.UserOneTimePreKeyWhereInput
-}
-
-/**
- * UserCountOutputType without action
- */
 export type UserCountOutputTypeCountRefreshTokensArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.RefreshTokenWhereInput
 }
@@ -1021,8 +777,6 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   updatedAt?: boolean
   conversations?: boolean | Prisma.User$conversationsArgs<ExtArgs>
   messages?: boolean | Prisma.User$messagesArgs<ExtArgs>
-  signedPreKeys?: boolean | Prisma.User$signedPreKeysArgs<ExtArgs>
-  oneTimePreKeys?: boolean | Prisma.User$oneTimePreKeysArgs<ExtArgs>
   identityKey?: boolean | Prisma.User$identityKeyArgs<ExtArgs>
   refreshTokens?: boolean | Prisma.User$refreshTokensArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -1062,8 +816,6 @@ export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = run
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   conversations?: boolean | Prisma.User$conversationsArgs<ExtArgs>
   messages?: boolean | Prisma.User$messagesArgs<ExtArgs>
-  signedPreKeys?: boolean | Prisma.User$signedPreKeysArgs<ExtArgs>
-  oneTimePreKeys?: boolean | Prisma.User$oneTimePreKeysArgs<ExtArgs>
   identityKey?: boolean | Prisma.User$identityKeyArgs<ExtArgs>
   refreshTokens?: boolean | Prisma.User$refreshTokensArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -1076,8 +828,6 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   objects: {
     conversations: Prisma.$ConversationMemberPayload<ExtArgs>[]
     messages: Prisma.$MessagePayload<ExtArgs>[]
-    signedPreKeys: Prisma.$UserSignedPreKeyPayload<ExtArgs>[]
-    oneTimePreKeys: Prisma.$UserOneTimePreKeyPayload<ExtArgs>[]
     identityKey: Prisma.$UserIdentityKeyPayload<ExtArgs> | null
     refreshTokens: Prisma.$RefreshTokenPayload<ExtArgs>[]
   }
@@ -1485,8 +1235,6 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   readonly [Symbol.toStringTag]: "PrismaPromise"
   conversations<T extends Prisma.User$conversationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$conversationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ConversationMemberPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   messages<T extends Prisma.User$messagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  signedPreKeys<T extends Prisma.User$signedPreKeysArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$signedPreKeysArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserSignedPreKeyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  oneTimePreKeys<T extends Prisma.User$oneTimePreKeysArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$oneTimePreKeysArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserOneTimePreKeyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   identityKey<T extends Prisma.User$identityKeyArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$identityKeyArgs<ExtArgs>>): Prisma.Prisma__UserIdentityKeyClient<runtime.Types.Result.GetResult<Prisma.$UserIdentityKeyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   refreshTokens<T extends Prisma.User$refreshTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$refreshTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RefreshTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -1963,54 +1711,6 @@ export type User$messagesArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.MessageScalarFieldEnum | Prisma.MessageScalarFieldEnum[]
-}
-
-/**
- * User.signedPreKeys
- */
-export type User$signedPreKeysArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the UserSignedPreKey
-   */
-  select?: Prisma.UserSignedPreKeySelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the UserSignedPreKey
-   */
-  omit?: Prisma.UserSignedPreKeyOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.UserSignedPreKeyInclude<ExtArgs> | null
-  where?: Prisma.UserSignedPreKeyWhereInput
-  orderBy?: Prisma.UserSignedPreKeyOrderByWithRelationInput | Prisma.UserSignedPreKeyOrderByWithRelationInput[]
-  cursor?: Prisma.UserSignedPreKeyWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.UserSignedPreKeyScalarFieldEnum | Prisma.UserSignedPreKeyScalarFieldEnum[]
-}
-
-/**
- * User.oneTimePreKeys
- */
-export type User$oneTimePreKeysArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the UserOneTimePreKey
-   */
-  select?: Prisma.UserOneTimePreKeySelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the UserOneTimePreKey
-   */
-  omit?: Prisma.UserOneTimePreKeyOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.UserOneTimePreKeyInclude<ExtArgs> | null
-  where?: Prisma.UserOneTimePreKeyWhereInput
-  orderBy?: Prisma.UserOneTimePreKeyOrderByWithRelationInput | Prisma.UserOneTimePreKeyOrderByWithRelationInput[]
-  cursor?: Prisma.UserOneTimePreKeyWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.UserOneTimePreKeyScalarFieldEnum | Prisma.UserOneTimePreKeyScalarFieldEnum[]
 }
 
 /**

@@ -184,6 +184,7 @@ export class ConversationService {
         conversationId: true,
         senderId: true,
         ciphertext: true,
+        nonce: true,
         createdAt: true,
         status: true,
       },
