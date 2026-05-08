@@ -8,8 +8,6 @@ datasource db {
   provider = "postgresql"
 }
 
-// ENUMS
-
 enum MessageType {
   TEXT
   IMAGE
