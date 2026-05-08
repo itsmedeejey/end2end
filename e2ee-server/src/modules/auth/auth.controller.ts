@@ -1,5 +1,5 @@
 import type { Response, Request } from "express"
-import { Controller, Post, Body, Res, Req, Get, UseGuards } from '@nestjs/common'
+import { Controller, Post, Body, Res, Req, Get, UseGuards, UnauthorizedException } from '@nestjs/common'
 import { RegisterUserDto } from './dto/registerUser.dto'
 import { LoginUserDto } from './dto/loginUser.dto'
 import { AuthService } from './auth.service'
@@ -24,7 +24,7 @@ export class AuthController {
 
     res.cookie("accessToken", tokens.accessToken, {
       ...options,
-      maxAge: 24 * 60 * 60 * 1000,
+      maxAge: 1 * 60 * 60 * 1000,
     });
 
     res.cookie("refreshToken", tokens.refreshToken, {
@@ -69,6 +69,21 @@ export class AuthController {
     return {
       user: req.user,
     };
+  }
+
+
+  @Post("refresh")
+  async refreshAccessToken(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response) {
+
+    const refreshToken: string = req.cookies.refreshToken;
+    if (!refreshToken) {
+      throw new UnauthorizedException();
+    }
+    const newTokens = await this.authService.getNewTokens(refreshToken);
+
+    this.setAuthCookies(res, newTokens)
   }
 
 

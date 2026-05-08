@@ -16,6 +16,7 @@ import { RegisterUserResponse } from './types/registerUserResponse.type';
 import { LoginUserDto } from './dto/loginUser.dto';
 import { verifyRecoveryKey } from 'src/utils/verifyRecoveryKey.util';
 import { loginUserResponse } from './types/loginUserResponse.type';
+import bcrypt from 'bcrypt'
 
 @Injectable()
 export class AuthService {
@@ -105,6 +106,88 @@ export class AuthService {
     } catch (err) {
       if (err instanceof HttpException) throw err;
       this.logger.error('Unexpected login error', err.stack);
+      throw new InternalServerErrorException();
+    }
+  }
+
+
+
+
+  // refresh both tokens store the refreshToken
+  async getNewTokens(refreshToken: string) {
+    try {
+      // verify JWT
+      const payload = await this.tokenService.verifyRefreshToken(refreshToken);
+
+      if (!payload) {
+        throw new UnauthorizedException();
+      }
+
+      const sessionId = payload.sessionId;
+
+      if (!sessionId) {
+        throw new UnauthorizedException();
+      }
+
+      // fetch session
+      const session =
+        await this.prisma.refreshToken.findUnique({
+          where: {
+            id: sessionId,
+          },
+        });
+
+      if (!session) {
+        throw new UnauthorizedException();
+      }
+
+      // already revoked?
+      if (session.revokedAt) {
+        throw new UnauthorizedException();
+      }
+
+      // expired?
+      if (session.expiresAt < new Date()) {
+        throw new UnauthorizedException();
+      }
+
+      // verifying token hash
+      const isValid = await bcrypt.compare(
+        refreshToken,
+        session.tokenHash
+      );
+
+      if (!isValid) {
+        throw new UnauthorizedException();
+      }
+
+      // NOW revoking  old token
+      await this.prisma.refreshToken.update({
+        where: {
+          id: sessionId,
+        },
+        data: {
+          revokedAt: new Date(),
+        },
+      });
+
+      // generate new tokens
+      const newTokens = await this.tokenService.generateTokens(
+        payload.sub,
+        payload.uid,
+        payload.name
+      );
+      return newTokens;
+
+    } catch (err) {
+      this.logger.error(
+        "Tokens rotation failed",
+        err.stack
+      );
+
+      if (err instanceof UnauthorizedException) {
+        throw err;
+      }
       throw new InternalServerErrorException();
     }
   }
