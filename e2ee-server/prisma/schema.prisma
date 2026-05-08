@@ -172,7 +172,7 @@ model UserIdentityKey {
 //
 //   @@index([userId])
 // }
-//
+
 // REFRESH TOKENS (MULTI-DEVICE SUPPORT)
 
 model RefreshToken {

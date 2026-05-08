@@ -2,6 +2,9 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './types/jwt-payload.type';
 import { PrismaService } from 'src/database/prisma.service';
+import { randomUUID } from 'node:crypto';
+import { refreshTokenPayload } from './types/jwt-payload.type';
+import bcrypt from 'bcrypt'
 
 @Injectable()
 export class TokenService {
@@ -22,7 +25,7 @@ export class TokenService {
 
     return this.jwtService.signAsync(payload, {
       secret: process.env.JWT_ACCESS_SECRET,
-      expiresIn: '1d',
+      expiresIn: '1h',
     });
   }
 
@@ -31,20 +34,27 @@ export class TokenService {
     uniqueUserId: string,
     displayName: string,
   ) {
+
+    const sessionId = randomUUID() // a randomUUID is takend as sessionId
+
     const payload = {
       sub: userId,
       uid: uniqueUserId,
       name: displayName,
       type: 'refresh' as const,
+      sessionId: sessionId,
     };
     const refreshToken = await this.jwtService.signAsync(payload, {
       secret: process.env.JWT_REFRESH_SECRET,
       expiresIn: '30d',
     });
+
+    const hashRefreshToken = await bcrypt.hash(refreshToken, 10);
+
     await this.prisma.refreshToken.create({
       data: {
         userId,
-        tokenHash: refreshToken,  //not storing hash value now 
+        tokenHash: hashRefreshToken,
         expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
       }
     })
@@ -79,9 +89,9 @@ export class TokenService {
     }
   }
 
-  async verifyRefreshToken(token: string): Promise<JwtPayload> {
+  async verifyRefreshToken(token: string): Promise<refreshTokenPayload> {
     try {
-      const payload = await this.jwtService.verifyAsync<JwtPayload>(token, {
+      const payload = await this.jwtService.verifyAsync<refreshTokenPayload>(token, {
         secret: process.env.JWT_REFRESH_SECRET,
       });
       if (payload.type !== 'refresh') {
