@@ -111,7 +111,7 @@ export class WebsocketGateway
     await client.join(conversationId);
   }
 
-  //  DISCONNECT HANDLER
+  // DISCONNECT HANDLER
   handleDisconnect(client: Socket) {
     const user = this.getSocketUser(client);
 
@@ -135,7 +135,7 @@ export class WebsocketGateway
     const nonce = data.nonce;
 
 
-    // 1. Check if user is part of conversation
+    //  Check if user is part of conversation
     const isMember = await this.prisma.conversationMember.findFirst({
       where: {
         conversationId,
@@ -147,7 +147,7 @@ export class WebsocketGateway
       throw new WsException('Not a member of this conversation');
     }
 
-    // 2. Save message
+    //  Save message
     const message = await this.prisma.message.create({
       data: {
         conversationId,
@@ -161,7 +161,7 @@ export class WebsocketGateway
 
     const serverCreatedAt = message.createdAt.toISOString();
 
-    // 3. Emit to all users in that conversation
+    //  Emit to all users in that conversation
     client.to(conversationId).emit('receive_message', {
       ...message,
       createdAt: serverCreatedAt,
@@ -177,7 +177,7 @@ export class WebsocketGateway
     };
   }
 
-  //  TYPING INDICATOR
+  // TYPING INDICATOR
   @SubscribeMessage('typing')
   handleTyping(
     @MessageBody()
