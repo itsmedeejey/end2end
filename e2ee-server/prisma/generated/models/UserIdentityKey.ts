@@ -9,8 +9,8 @@
  * 🟢 You can import this file directly.
  */
 import type * as runtime from "@prisma/client/runtime/client"
-import type * as $Enums from "../enums"
-import type * as Prisma from "../internal/prismaNamespace"
+import type * as $Enums from "../enums.js"
+import type * as Prisma from "../internal/prismaNamespace.js"
 
 /**
  * Model UserIdentityKey
@@ -20,24 +20,13 @@ export type UserIdentityKeyModel = runtime.Types.Result.DefaultSelection<Prisma.
 
 export type AggregateUserIdentityKey = {
   _count: UserIdentityKeyCountAggregateOutputType | null
-  _avg: UserIdentityKeyAvgAggregateOutputType | null
-  _sum: UserIdentityKeySumAggregateOutputType | null
   _min: UserIdentityKeyMinAggregateOutputType | null
   _max: UserIdentityKeyMaxAggregateOutputType | null
-}
-
-export type UserIdentityKeyAvgAggregateOutputType = {
-  registrationId: number | null
-}
-
-export type UserIdentityKeySumAggregateOutputType = {
-  registrationId: number | null
 }
 
 export type UserIdentityKeyMinAggregateOutputType = {
   id: string | null
   userId: string | null
-  registrationId: number | null
   publicKey: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -46,7 +35,6 @@ export type UserIdentityKeyMinAggregateOutputType = {
 export type UserIdentityKeyMaxAggregateOutputType = {
   id: string | null
   userId: string | null
-  registrationId: number | null
   publicKey: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -55,7 +43,6 @@ export type UserIdentityKeyMaxAggregateOutputType = {
 export type UserIdentityKeyCountAggregateOutputType = {
   id: number
   userId: number
-  registrationId: number
   publicKey: number
   createdAt: number
   updatedAt: number
@@ -63,18 +50,9 @@ export type UserIdentityKeyCountAggregateOutputType = {
 }
 
 
-export type UserIdentityKeyAvgAggregateInputType = {
-  registrationId?: true
-}
-
-export type UserIdentityKeySumAggregateInputType = {
-  registrationId?: true
-}
-
 export type UserIdentityKeyMinAggregateInputType = {
   id?: true
   userId?: true
-  registrationId?: true
   publicKey?: true
   createdAt?: true
   updatedAt?: true
@@ -83,7 +61,6 @@ export type UserIdentityKeyMinAggregateInputType = {
 export type UserIdentityKeyMaxAggregateInputType = {
   id?: true
   userId?: true
-  registrationId?: true
   publicKey?: true
   createdAt?: true
   updatedAt?: true
@@ -92,7 +69,6 @@ export type UserIdentityKeyMaxAggregateInputType = {
 export type UserIdentityKeyCountAggregateInputType = {
   id?: true
   userId?: true
-  registrationId?: true
   publicKey?: true
   createdAt?: true
   updatedAt?: true
@@ -137,18 +113,6 @@ export type UserIdentityKeyAggregateArgs<ExtArgs extends runtime.Types.Extension
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
-   * Select which fields to average
-  **/
-  _avg?: UserIdentityKeyAvgAggregateInputType
-  /**
-   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-   * 
-   * Select which fields to sum
-  **/
-  _sum?: UserIdentityKeySumAggregateInputType
-  /**
-   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-   * 
    * Select which fields to find the minimum value
   **/
   _min?: UserIdentityKeyMinAggregateInputType
@@ -179,8 +143,6 @@ export type UserIdentityKeyGroupByArgs<ExtArgs extends runtime.Types.Extensions.
   take?: number
   skip?: number
   _count?: UserIdentityKeyCountAggregateInputType | true
-  _avg?: UserIdentityKeyAvgAggregateInputType
-  _sum?: UserIdentityKeySumAggregateInputType
   _min?: UserIdentityKeyMinAggregateInputType
   _max?: UserIdentityKeyMaxAggregateInputType
 }
@@ -188,13 +150,10 @@ export type UserIdentityKeyGroupByArgs<ExtArgs extends runtime.Types.Extensions.
 export type UserIdentityKeyGroupByOutputType = {
   id: string
   userId: string
-  registrationId: number
   publicKey: string
   createdAt: Date
   updatedAt: Date
   _count: UserIdentityKeyCountAggregateOutputType | null
-  _avg: UserIdentityKeyAvgAggregateOutputType | null
-  _sum: UserIdentityKeySumAggregateOutputType | null
   _min: UserIdentityKeyMinAggregateOutputType | null
   _max: UserIdentityKeyMaxAggregateOutputType | null
 }
@@ -220,7 +179,6 @@ export type UserIdentityKeyWhereInput = {
   NOT?: Prisma.UserIdentityKeyWhereInput | Prisma.UserIdentityKeyWhereInput[]
   id?: Prisma.StringFilter<"UserIdentityKey"> | string
   userId?: Prisma.StringFilter<"UserIdentityKey"> | string
-  registrationId?: Prisma.IntFilter<"UserIdentityKey"> | number
   publicKey?: Prisma.StringFilter<"UserIdentityKey"> | string
   createdAt?: Prisma.DateTimeFilter<"UserIdentityKey"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"UserIdentityKey"> | Date | string
@@ -230,7 +188,6 @@ export type UserIdentityKeyWhereInput = {
 export type UserIdentityKeyOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  registrationId?: Prisma.SortOrder
   publicKey?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -243,7 +200,6 @@ export type UserIdentityKeyWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.UserIdentityKeyWhereInput | Prisma.UserIdentityKeyWhereInput[]
   OR?: Prisma.UserIdentityKeyWhereInput[]
   NOT?: Prisma.UserIdentityKeyWhereInput | Prisma.UserIdentityKeyWhereInput[]
-  registrationId?: Prisma.IntFilter<"UserIdentityKey"> | number
   publicKey?: Prisma.StringFilter<"UserIdentityKey"> | string
   createdAt?: Prisma.DateTimeFilter<"UserIdentityKey"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"UserIdentityKey"> | Date | string
@@ -253,15 +209,12 @@ export type UserIdentityKeyWhereUniqueInput = Prisma.AtLeast<{
 export type UserIdentityKeyOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  registrationId?: Prisma.SortOrder
   publicKey?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.UserIdentityKeyCountOrderByAggregateInput
-  _avg?: Prisma.UserIdentityKeyAvgOrderByAggregateInput
   _max?: Prisma.UserIdentityKeyMaxOrderByAggregateInput
   _min?: Prisma.UserIdentityKeyMinOrderByAggregateInput
-  _sum?: Prisma.UserIdentityKeySumOrderByAggregateInput
 }
 
 export type UserIdentityKeyScalarWhereWithAggregatesInput = {
@@ -270,7 +223,6 @@ export type UserIdentityKeyScalarWhereWithAggregatesInput = {
   NOT?: Prisma.UserIdentityKeyScalarWhereWithAggregatesInput | Prisma.UserIdentityKeyScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"UserIdentityKey"> | string
   userId?: Prisma.StringWithAggregatesFilter<"UserIdentityKey"> | string
-  registrationId?: Prisma.IntWithAggregatesFilter<"UserIdentityKey"> | number
   publicKey?: Prisma.StringWithAggregatesFilter<"UserIdentityKey"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"UserIdentityKey"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"UserIdentityKey"> | Date | string
@@ -278,7 +230,6 @@ export type UserIdentityKeyScalarWhereWithAggregatesInput = {
 
 export type UserIdentityKeyCreateInput = {
   id?: string
-  registrationId: number
   publicKey: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -288,7 +239,6 @@ export type UserIdentityKeyCreateInput = {
 export type UserIdentityKeyUncheckedCreateInput = {
   id?: string
   userId: string
-  registrationId: number
   publicKey: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -296,7 +246,6 @@ export type UserIdentityKeyUncheckedCreateInput = {
 
 export type UserIdentityKeyUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  registrationId?: Prisma.IntFieldUpdateOperationsInput | number
   publicKey?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -306,7 +255,6 @@ export type UserIdentityKeyUpdateInput = {
 export type UserIdentityKeyUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  registrationId?: Prisma.IntFieldUpdateOperationsInput | number
   publicKey?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -315,7 +263,6 @@ export type UserIdentityKeyUncheckedUpdateInput = {
 export type UserIdentityKeyCreateManyInput = {
   id?: string
   userId: string
-  registrationId: number
   publicKey: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -323,7 +270,6 @@ export type UserIdentityKeyCreateManyInput = {
 
 export type UserIdentityKeyUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  registrationId?: Prisma.IntFieldUpdateOperationsInput | number
   publicKey?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -332,7 +278,6 @@ export type UserIdentityKeyUpdateManyMutationInput = {
 export type UserIdentityKeyUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  registrationId?: Prisma.IntFieldUpdateOperationsInput | number
   publicKey?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -346,20 +291,14 @@ export type UserIdentityKeyNullableScalarRelationFilter = {
 export type UserIdentityKeyCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  registrationId?: Prisma.SortOrder
   publicKey?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
-export type UserIdentityKeyAvgOrderByAggregateInput = {
-  registrationId?: Prisma.SortOrder
-}
-
 export type UserIdentityKeyMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  registrationId?: Prisma.SortOrder
   publicKey?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -368,14 +307,9 @@ export type UserIdentityKeyMaxOrderByAggregateInput = {
 export type UserIdentityKeyMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  registrationId?: Prisma.SortOrder
   publicKey?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-}
-
-export type UserIdentityKeySumOrderByAggregateInput = {
-  registrationId?: Prisma.SortOrder
 }
 
 export type UserIdentityKeyCreateNestedOneWithoutUserInput = {
@@ -410,17 +344,8 @@ export type UserIdentityKeyUncheckedUpdateOneWithoutUserNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserIdentityKeyUpdateToOneWithWhereWithoutUserInput, Prisma.UserIdentityKeyUpdateWithoutUserInput>, Prisma.UserIdentityKeyUncheckedUpdateWithoutUserInput>
 }
 
-export type IntFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type UserIdentityKeyCreateWithoutUserInput = {
   id?: string
-  registrationId: number
   publicKey: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -428,7 +353,6 @@ export type UserIdentityKeyCreateWithoutUserInput = {
 
 export type UserIdentityKeyUncheckedCreateWithoutUserInput = {
   id?: string
-  registrationId: number
   publicKey: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -452,7 +376,6 @@ export type UserIdentityKeyUpdateToOneWithWhereWithoutUserInput = {
 
 export type UserIdentityKeyUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  registrationId?: Prisma.IntFieldUpdateOperationsInput | number
   publicKey?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -460,7 +383,6 @@ export type UserIdentityKeyUpdateWithoutUserInput = {
 
 export type UserIdentityKeyUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  registrationId?: Prisma.IntFieldUpdateOperationsInput | number
   publicKey?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -471,7 +393,6 @@ export type UserIdentityKeyUncheckedUpdateWithoutUserInput = {
 export type UserIdentityKeySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   userId?: boolean
-  registrationId?: boolean
   publicKey?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -481,7 +402,6 @@ export type UserIdentityKeySelect<ExtArgs extends runtime.Types.Extensions.Inter
 export type UserIdentityKeySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   userId?: boolean
-  registrationId?: boolean
   publicKey?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -491,7 +411,6 @@ export type UserIdentityKeySelectCreateManyAndReturn<ExtArgs extends runtime.Typ
 export type UserIdentityKeySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   userId?: boolean
-  registrationId?: boolean
   publicKey?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -501,13 +420,12 @@ export type UserIdentityKeySelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
 export type UserIdentityKeySelectScalar = {
   id?: boolean
   userId?: boolean
-  registrationId?: boolean
   publicKey?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type UserIdentityKeyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "registrationId" | "publicKey" | "createdAt" | "updatedAt", ExtArgs["result"]["userIdentityKey"]>
+export type UserIdentityKeyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "publicKey" | "createdAt" | "updatedAt", ExtArgs["result"]["userIdentityKey"]>
 export type UserIdentityKeyInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -526,7 +444,6 @@ export type $UserIdentityKeyPayload<ExtArgs extends runtime.Types.Extensions.Int
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     userId: string
-    registrationId: number
     publicKey: string
     createdAt: Date
     updatedAt: Date
@@ -956,7 +873,6 @@ export interface Prisma__UserIdentityKeyClient<T, Null = never, ExtArgs extends 
 export interface UserIdentityKeyFieldRefs {
   readonly id: Prisma.FieldRef<"UserIdentityKey", 'String'>
   readonly userId: Prisma.FieldRef<"UserIdentityKey", 'String'>
-  readonly registrationId: Prisma.FieldRef<"UserIdentityKey", 'Int'>
   readonly publicKey: Prisma.FieldRef<"UserIdentityKey", 'String'>
   readonly createdAt: Prisma.FieldRef<"UserIdentityKey", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"UserIdentityKey", 'DateTime'>

@@ -13,10 +13,10 @@
  * 🟢 You can import this file directly.
  */
 
-import * as Prisma from './internal/prismaNamespaceBrowser'
+import * as Prisma from './internal/prismaNamespaceBrowser.js'
 export { Prisma }
-export * as $Enums from './enums'
-export * from './enums';
+export * as $Enums from './enums.js'
+export * from './enums.js';
 /**
  * Model User
  * 
@@ -42,16 +42,6 @@ export type Message = Prisma.MessageModel
  * 
  */
 export type UserIdentityKey = Prisma.UserIdentityKeyModel
-/**
- * Model UserSignedPreKey
- * 
- */
-export type UserSignedPreKey = Prisma.UserSignedPreKeyModel
-/**
- * Model UserOneTimePreKey
- * 
- */
-export type UserOneTimePreKey = Prisma.UserOneTimePreKeyModel
 /**
  * Model RefreshToken
  * 

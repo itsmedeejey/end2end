@@ -9,8 +9,8 @@
  * 🟢 You can import this file directly.
  */
 import type * as runtime from "@prisma/client/runtime/client"
-import type * as $Enums from "../enums"
-import type * as Prisma from "../internal/prismaNamespace"
+import type * as $Enums from "../enums.js"
+import type * as Prisma from "../internal/prismaNamespace.js"
 
 /**
  * Model Message
@@ -29,10 +29,9 @@ export type MessageMinAggregateOutputType = {
   conversationId: string | null
   senderId: string | null
   ciphertext: string | null
+  nonce: string | null
   messageType: $Enums.MessageType | null
   status: $Enums.MessageStatus | null
-  protocolVersion: string | null
-  isPreKeyMessage: boolean | null
   createdAt: Date | null
   deliveredAt: Date | null
   seenAt: Date | null
@@ -43,10 +42,9 @@ export type MessageMaxAggregateOutputType = {
   conversationId: string | null
   senderId: string | null
   ciphertext: string | null
+  nonce: string | null
   messageType: $Enums.MessageType | null
   status: $Enums.MessageStatus | null
-  protocolVersion: string | null
-  isPreKeyMessage: boolean | null
   createdAt: Date | null
   deliveredAt: Date | null
   seenAt: Date | null
@@ -57,10 +55,9 @@ export type MessageCountAggregateOutputType = {
   conversationId: number
   senderId: number
   ciphertext: number
+  nonce: number
   messageType: number
   status: number
-  protocolVersion: number
-  isPreKeyMessage: number
   createdAt: number
   deliveredAt: number
   seenAt: number
@@ -73,10 +70,9 @@ export type MessageMinAggregateInputType = {
   conversationId?: true
   senderId?: true
   ciphertext?: true
+  nonce?: true
   messageType?: true
   status?: true
-  protocolVersion?: true
-  isPreKeyMessage?: true
   createdAt?: true
   deliveredAt?: true
   seenAt?: true
@@ -87,10 +83,9 @@ export type MessageMaxAggregateInputType = {
   conversationId?: true
   senderId?: true
   ciphertext?: true
+  nonce?: true
   messageType?: true
   status?: true
-  protocolVersion?: true
-  isPreKeyMessage?: true
   createdAt?: true
   deliveredAt?: true
   seenAt?: true
@@ -101,10 +96,9 @@ export type MessageCountAggregateInputType = {
   conversationId?: true
   senderId?: true
   ciphertext?: true
+  nonce?: true
   messageType?: true
   status?: true
-  protocolVersion?: true
-  isPreKeyMessage?: true
   createdAt?: true
   deliveredAt?: true
   seenAt?: true
@@ -188,10 +182,9 @@ export type MessageGroupByOutputType = {
   conversationId: string
   senderId: string
   ciphertext: string
+  nonce: string
   messageType: $Enums.MessageType
   status: $Enums.MessageStatus
-  protocolVersion: string
-  isPreKeyMessage: boolean
   createdAt: Date
   deliveredAt: Date | null
   seenAt: Date | null
@@ -223,10 +216,9 @@ export type MessageWhereInput = {
   conversationId?: Prisma.StringFilter<"Message"> | string
   senderId?: Prisma.StringFilter<"Message"> | string
   ciphertext?: Prisma.StringFilter<"Message"> | string
+  nonce?: Prisma.StringFilter<"Message"> | string
   messageType?: Prisma.EnumMessageTypeFilter<"Message"> | $Enums.MessageType
   status?: Prisma.EnumMessageStatusFilter<"Message"> | $Enums.MessageStatus
-  protocolVersion?: Prisma.StringFilter<"Message"> | string
-  isPreKeyMessage?: Prisma.BoolFilter<"Message"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Message"> | Date | string
   deliveredAt?: Prisma.DateTimeNullableFilter<"Message"> | Date | string | null
   seenAt?: Prisma.DateTimeNullableFilter<"Message"> | Date | string | null
@@ -239,10 +231,9 @@ export type MessageOrderByWithRelationInput = {
   conversationId?: Prisma.SortOrder
   senderId?: Prisma.SortOrder
   ciphertext?: Prisma.SortOrder
+  nonce?: Prisma.SortOrder
   messageType?: Prisma.SortOrder
   status?: Prisma.SortOrder
-  protocolVersion?: Prisma.SortOrder
-  isPreKeyMessage?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   deliveredAt?: Prisma.SortOrderInput | Prisma.SortOrder
   seenAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -258,10 +249,9 @@ export type MessageWhereUniqueInput = Prisma.AtLeast<{
   conversationId?: Prisma.StringFilter<"Message"> | string
   senderId?: Prisma.StringFilter<"Message"> | string
   ciphertext?: Prisma.StringFilter<"Message"> | string
+  nonce?: Prisma.StringFilter<"Message"> | string
   messageType?: Prisma.EnumMessageTypeFilter<"Message"> | $Enums.MessageType
   status?: Prisma.EnumMessageStatusFilter<"Message"> | $Enums.MessageStatus
-  protocolVersion?: Prisma.StringFilter<"Message"> | string
-  isPreKeyMessage?: Prisma.BoolFilter<"Message"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Message"> | Date | string
   deliveredAt?: Prisma.DateTimeNullableFilter<"Message"> | Date | string | null
   seenAt?: Prisma.DateTimeNullableFilter<"Message"> | Date | string | null
@@ -274,10 +264,9 @@ export type MessageOrderByWithAggregationInput = {
   conversationId?: Prisma.SortOrder
   senderId?: Prisma.SortOrder
   ciphertext?: Prisma.SortOrder
+  nonce?: Prisma.SortOrder
   messageType?: Prisma.SortOrder
   status?: Prisma.SortOrder
-  protocolVersion?: Prisma.SortOrder
-  isPreKeyMessage?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   deliveredAt?: Prisma.SortOrderInput | Prisma.SortOrder
   seenAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -294,10 +283,9 @@ export type MessageScalarWhereWithAggregatesInput = {
   conversationId?: Prisma.StringWithAggregatesFilter<"Message"> | string
   senderId?: Prisma.StringWithAggregatesFilter<"Message"> | string
   ciphertext?: Prisma.StringWithAggregatesFilter<"Message"> | string
+  nonce?: Prisma.StringWithAggregatesFilter<"Message"> | string
   messageType?: Prisma.EnumMessageTypeWithAggregatesFilter<"Message"> | $Enums.MessageType
   status?: Prisma.EnumMessageStatusWithAggregatesFilter<"Message"> | $Enums.MessageStatus
-  protocolVersion?: Prisma.StringWithAggregatesFilter<"Message"> | string
-  isPreKeyMessage?: Prisma.BoolWithAggregatesFilter<"Message"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Message"> | Date | string
   deliveredAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Message"> | Date | string | null
   seenAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Message"> | Date | string | null
@@ -306,10 +294,9 @@ export type MessageScalarWhereWithAggregatesInput = {
 export type MessageCreateInput = {
   id?: string
   ciphertext: string
+  nonce: string
   messageType: $Enums.MessageType
   status: $Enums.MessageStatus
-  protocolVersion: string
-  isPreKeyMessage: boolean
   createdAt?: Date | string
   deliveredAt?: Date | string | null
   seenAt?: Date | string | null
@@ -322,10 +309,9 @@ export type MessageUncheckedCreateInput = {
   conversationId: string
   senderId: string
   ciphertext: string
+  nonce: string
   messageType: $Enums.MessageType
   status: $Enums.MessageStatus
-  protocolVersion: string
-  isPreKeyMessage: boolean
   createdAt?: Date | string
   deliveredAt?: Date | string | null
   seenAt?: Date | string | null
@@ -334,10 +320,9 @@ export type MessageUncheckedCreateInput = {
 export type MessageUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   ciphertext?: Prisma.StringFieldUpdateOperationsInput | string
+  nonce?: Prisma.StringFieldUpdateOperationsInput | string
   messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   status?: Prisma.EnumMessageStatusFieldUpdateOperationsInput | $Enums.MessageStatus
-  protocolVersion?: Prisma.StringFieldUpdateOperationsInput | string
-  isPreKeyMessage?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   seenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -350,10 +335,9 @@ export type MessageUncheckedUpdateInput = {
   conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   senderId?: Prisma.StringFieldUpdateOperationsInput | string
   ciphertext?: Prisma.StringFieldUpdateOperationsInput | string
+  nonce?: Prisma.StringFieldUpdateOperationsInput | string
   messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   status?: Prisma.EnumMessageStatusFieldUpdateOperationsInput | $Enums.MessageStatus
-  protocolVersion?: Prisma.StringFieldUpdateOperationsInput | string
-  isPreKeyMessage?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   seenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -364,10 +348,9 @@ export type MessageCreateManyInput = {
   conversationId: string
   senderId: string
   ciphertext: string
+  nonce: string
   messageType: $Enums.MessageType
   status: $Enums.MessageStatus
-  protocolVersion: string
-  isPreKeyMessage: boolean
   createdAt?: Date | string
   deliveredAt?: Date | string | null
   seenAt?: Date | string | null
@@ -376,10 +359,9 @@ export type MessageCreateManyInput = {
 export type MessageUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   ciphertext?: Prisma.StringFieldUpdateOperationsInput | string
+  nonce?: Prisma.StringFieldUpdateOperationsInput | string
   messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   status?: Prisma.EnumMessageStatusFieldUpdateOperationsInput | $Enums.MessageStatus
-  protocolVersion?: Prisma.StringFieldUpdateOperationsInput | string
-  isPreKeyMessage?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   seenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -390,10 +372,9 @@ export type MessageUncheckedUpdateManyInput = {
   conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   senderId?: Prisma.StringFieldUpdateOperationsInput | string
   ciphertext?: Prisma.StringFieldUpdateOperationsInput | string
+  nonce?: Prisma.StringFieldUpdateOperationsInput | string
   messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   status?: Prisma.EnumMessageStatusFieldUpdateOperationsInput | $Enums.MessageStatus
-  protocolVersion?: Prisma.StringFieldUpdateOperationsInput | string
-  isPreKeyMessage?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   seenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -414,10 +395,9 @@ export type MessageCountOrderByAggregateInput = {
   conversationId?: Prisma.SortOrder
   senderId?: Prisma.SortOrder
   ciphertext?: Prisma.SortOrder
+  nonce?: Prisma.SortOrder
   messageType?: Prisma.SortOrder
   status?: Prisma.SortOrder
-  protocolVersion?: Prisma.SortOrder
-  isPreKeyMessage?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   deliveredAt?: Prisma.SortOrder
   seenAt?: Prisma.SortOrder
@@ -428,10 +408,9 @@ export type MessageMaxOrderByAggregateInput = {
   conversationId?: Prisma.SortOrder
   senderId?: Prisma.SortOrder
   ciphertext?: Prisma.SortOrder
+  nonce?: Prisma.SortOrder
   messageType?: Prisma.SortOrder
   status?: Prisma.SortOrder
-  protocolVersion?: Prisma.SortOrder
-  isPreKeyMessage?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   deliveredAt?: Prisma.SortOrder
   seenAt?: Prisma.SortOrder
@@ -442,10 +421,9 @@ export type MessageMinOrderByAggregateInput = {
   conversationId?: Prisma.SortOrder
   senderId?: Prisma.SortOrder
   ciphertext?: Prisma.SortOrder
+  nonce?: Prisma.SortOrder
   messageType?: Prisma.SortOrder
   status?: Prisma.SortOrder
-  protocolVersion?: Prisma.SortOrder
-  isPreKeyMessage?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   deliveredAt?: Prisma.SortOrder
   seenAt?: Prisma.SortOrder
@@ -543,10 +521,6 @@ export type EnumMessageStatusFieldUpdateOperationsInput = {
   set?: $Enums.MessageStatus
 }
 
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
-}
-
 export type NullableDateTimeFieldUpdateOperationsInput = {
   set?: Date | string | null
 }
@@ -554,10 +528,9 @@ export type NullableDateTimeFieldUpdateOperationsInput = {
 export type MessageCreateWithoutSenderInput = {
   id?: string
   ciphertext: string
+  nonce: string
   messageType: $Enums.MessageType
   status: $Enums.MessageStatus
-  protocolVersion: string
-  isPreKeyMessage: boolean
   createdAt?: Date | string
   deliveredAt?: Date | string | null
   seenAt?: Date | string | null
@@ -568,10 +541,9 @@ export type MessageUncheckedCreateWithoutSenderInput = {
   id?: string
   conversationId: string
   ciphertext: string
+  nonce: string
   messageType: $Enums.MessageType
   status: $Enums.MessageStatus
-  protocolVersion: string
-  isPreKeyMessage: boolean
   createdAt?: Date | string
   deliveredAt?: Date | string | null
   seenAt?: Date | string | null
@@ -611,10 +583,9 @@ export type MessageScalarWhereInput = {
   conversationId?: Prisma.StringFilter<"Message"> | string
   senderId?: Prisma.StringFilter<"Message"> | string
   ciphertext?: Prisma.StringFilter<"Message"> | string
+  nonce?: Prisma.StringFilter<"Message"> | string
   messageType?: Prisma.EnumMessageTypeFilter<"Message"> | $Enums.MessageType
   status?: Prisma.EnumMessageStatusFilter<"Message"> | $Enums.MessageStatus
-  protocolVersion?: Prisma.StringFilter<"Message"> | string
-  isPreKeyMessage?: Prisma.BoolFilter<"Message"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Message"> | Date | string
   deliveredAt?: Prisma.DateTimeNullableFilter<"Message"> | Date | string | null
   seenAt?: Prisma.DateTimeNullableFilter<"Message"> | Date | string | null
@@ -623,10 +594,9 @@ export type MessageScalarWhereInput = {
 export type MessageCreateWithoutConversationInput = {
   id?: string
   ciphertext: string
+  nonce: string
   messageType: $Enums.MessageType
   status: $Enums.MessageStatus
-  protocolVersion: string
-  isPreKeyMessage: boolean
   createdAt?: Date | string
   deliveredAt?: Date | string | null
   seenAt?: Date | string | null
@@ -637,10 +607,9 @@ export type MessageUncheckedCreateWithoutConversationInput = {
   id?: string
   senderId: string
   ciphertext: string
+  nonce: string
   messageType: $Enums.MessageType
   status: $Enums.MessageStatus
-  protocolVersion: string
-  isPreKeyMessage: boolean
   createdAt?: Date | string
   deliveredAt?: Date | string | null
   seenAt?: Date | string | null
@@ -676,10 +645,9 @@ export type MessageCreateManySenderInput = {
   id?: string
   conversationId: string
   ciphertext: string
+  nonce: string
   messageType: $Enums.MessageType
   status: $Enums.MessageStatus
-  protocolVersion: string
-  isPreKeyMessage: boolean
   createdAt?: Date | string
   deliveredAt?: Date | string | null
   seenAt?: Date | string | null
@@ -688,10 +656,9 @@ export type MessageCreateManySenderInput = {
 export type MessageUpdateWithoutSenderInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   ciphertext?: Prisma.StringFieldUpdateOperationsInput | string
+  nonce?: Prisma.StringFieldUpdateOperationsInput | string
   messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   status?: Prisma.EnumMessageStatusFieldUpdateOperationsInput | $Enums.MessageStatus
-  protocolVersion?: Prisma.StringFieldUpdateOperationsInput | string
-  isPreKeyMessage?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   seenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -702,10 +669,9 @@ export type MessageUncheckedUpdateWithoutSenderInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   ciphertext?: Prisma.StringFieldUpdateOperationsInput | string
+  nonce?: Prisma.StringFieldUpdateOperationsInput | string
   messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   status?: Prisma.EnumMessageStatusFieldUpdateOperationsInput | $Enums.MessageStatus
-  protocolVersion?: Prisma.StringFieldUpdateOperationsInput | string
-  isPreKeyMessage?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   seenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -715,10 +681,9 @@ export type MessageUncheckedUpdateManyWithoutSenderInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   conversationId?: Prisma.StringFieldUpdateOperationsInput | string
   ciphertext?: Prisma.StringFieldUpdateOperationsInput | string
+  nonce?: Prisma.StringFieldUpdateOperationsInput | string
   messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   status?: Prisma.EnumMessageStatusFieldUpdateOperationsInput | $Enums.MessageStatus
-  protocolVersion?: Prisma.StringFieldUpdateOperationsInput | string
-  isPreKeyMessage?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   seenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -728,10 +693,9 @@ export type MessageCreateManyConversationInput = {
   id?: string
   senderId: string
   ciphertext: string
+  nonce: string
   messageType: $Enums.MessageType
   status: $Enums.MessageStatus
-  protocolVersion: string
-  isPreKeyMessage: boolean
   createdAt?: Date | string
   deliveredAt?: Date | string | null
   seenAt?: Date | string | null
@@ -740,10 +704,9 @@ export type MessageCreateManyConversationInput = {
 export type MessageUpdateWithoutConversationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   ciphertext?: Prisma.StringFieldUpdateOperationsInput | string
+  nonce?: Prisma.StringFieldUpdateOperationsInput | string
   messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   status?: Prisma.EnumMessageStatusFieldUpdateOperationsInput | $Enums.MessageStatus
-  protocolVersion?: Prisma.StringFieldUpdateOperationsInput | string
-  isPreKeyMessage?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   seenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -754,10 +717,9 @@ export type MessageUncheckedUpdateWithoutConversationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   senderId?: Prisma.StringFieldUpdateOperationsInput | string
   ciphertext?: Prisma.StringFieldUpdateOperationsInput | string
+  nonce?: Prisma.StringFieldUpdateOperationsInput | string
   messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   status?: Prisma.EnumMessageStatusFieldUpdateOperationsInput | $Enums.MessageStatus
-  protocolVersion?: Prisma.StringFieldUpdateOperationsInput | string
-  isPreKeyMessage?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   seenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -767,10 +729,9 @@ export type MessageUncheckedUpdateManyWithoutConversationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   senderId?: Prisma.StringFieldUpdateOperationsInput | string
   ciphertext?: Prisma.StringFieldUpdateOperationsInput | string
+  nonce?: Prisma.StringFieldUpdateOperationsInput | string
   messageType?: Prisma.EnumMessageTypeFieldUpdateOperationsInput | $Enums.MessageType
   status?: Prisma.EnumMessageStatusFieldUpdateOperationsInput | $Enums.MessageStatus
-  protocolVersion?: Prisma.StringFieldUpdateOperationsInput | string
-  isPreKeyMessage?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deliveredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   seenAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -783,10 +744,9 @@ export type MessageSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   conversationId?: boolean
   senderId?: boolean
   ciphertext?: boolean
+  nonce?: boolean
   messageType?: boolean
   status?: boolean
-  protocolVersion?: boolean
-  isPreKeyMessage?: boolean
   createdAt?: boolean
   deliveredAt?: boolean
   seenAt?: boolean
@@ -799,10 +759,9 @@ export type MessageSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   conversationId?: boolean
   senderId?: boolean
   ciphertext?: boolean
+  nonce?: boolean
   messageType?: boolean
   status?: boolean
-  protocolVersion?: boolean
-  isPreKeyMessage?: boolean
   createdAt?: boolean
   deliveredAt?: boolean
   seenAt?: boolean
@@ -815,10 +774,9 @@ export type MessageSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   conversationId?: boolean
   senderId?: boolean
   ciphertext?: boolean
+  nonce?: boolean
   messageType?: boolean
   status?: boolean
-  protocolVersion?: boolean
-  isPreKeyMessage?: boolean
   createdAt?: boolean
   deliveredAt?: boolean
   seenAt?: boolean
@@ -831,16 +789,15 @@ export type MessageSelectScalar = {
   conversationId?: boolean
   senderId?: boolean
   ciphertext?: boolean
+  nonce?: boolean
   messageType?: boolean
   status?: boolean
-  protocolVersion?: boolean
-  isPreKeyMessage?: boolean
   createdAt?: boolean
   deliveredAt?: boolean
   seenAt?: boolean
 }
 
-export type MessageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "conversationId" | "senderId" | "ciphertext" | "messageType" | "status" | "protocolVersion" | "isPreKeyMessage" | "createdAt" | "deliveredAt" | "seenAt", ExtArgs["result"]["message"]>
+export type MessageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "conversationId" | "senderId" | "ciphertext" | "nonce" | "messageType" | "status" | "createdAt" | "deliveredAt" | "seenAt", ExtArgs["result"]["message"]>
 export type MessageInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   conversation?: boolean | Prisma.ConversationDefaultArgs<ExtArgs>
   sender?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -865,10 +822,9 @@ export type $MessagePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     conversationId: string
     senderId: string
     ciphertext: string
+    nonce: string
     messageType: $Enums.MessageType
     status: $Enums.MessageStatus
-    protocolVersion: string
-    isPreKeyMessage: boolean
     createdAt: Date
     deliveredAt: Date | null
     seenAt: Date | null
@@ -1301,10 +1257,9 @@ export interface MessageFieldRefs {
   readonly conversationId: Prisma.FieldRef<"Message", 'String'>
   readonly senderId: Prisma.FieldRef<"Message", 'String'>
   readonly ciphertext: Prisma.FieldRef<"Message", 'String'>
+  readonly nonce: Prisma.FieldRef<"Message", 'String'>
   readonly messageType: Prisma.FieldRef<"Message", 'MessageType'>
   readonly status: Prisma.FieldRef<"Message", 'MessageStatus'>
-  readonly protocolVersion: Prisma.FieldRef<"Message", 'String'>
-  readonly isPreKeyMessage: Prisma.FieldRef<"Message", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Message", 'DateTime'>
   readonly deliveredAt: Prisma.FieldRef<"Message", 'DateTime'>
   readonly seenAt: Prisma.FieldRef<"Message", 'DateTime'>

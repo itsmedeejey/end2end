@@ -73,6 +73,7 @@ export class ConversationService {
         conversationId: conversation.id,
         participant: user,
       };
+
     } catch (error) {
       // Handle duplicate creation
       const fallback = await this.prisma.conversation.findUnique({
@@ -183,6 +184,7 @@ export class ConversationService {
         conversationId: true,
         senderId: true,
         ciphertext: true,
+        nonce: true,
         createdAt: true,
         status: true,
       },

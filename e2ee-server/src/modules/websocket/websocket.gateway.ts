@@ -111,7 +111,7 @@ export class WebsocketGateway
     await client.join(conversationId);
   }
 
-  //  DISCONNECT HANDLER
+  // DISCONNECT HANDLER
   handleDisconnect(client: Socket) {
     const user = this.getSocketUser(client);
 
@@ -128,12 +128,14 @@ export class WebsocketGateway
   ) {
     const user = this.getRequiredSocketUser(client);
     const userId = user.sub;
+    const userUniqueId = user.uid;
     const conversationId = data.conversationId;
-    const content = data.content;
+    const content = data.cipherText;
     const clientTempId = data.clientTempId;
+    const nonce = data.nonce;
 
 
-    // 1. Check if user is part of conversation
+    //  Check if user is part of conversation
     const isMember = await this.prisma.conversationMember.findFirst({
       where: {
         conversationId,
@@ -145,27 +147,26 @@ export class WebsocketGateway
       throw new WsException('Not a member of this conversation');
     }
 
-    // 2. Save message
+    //  Save message
     const message = await this.prisma.message.create({
       data: {
         conversationId,
-        senderId: userId,
+        senderId: userUniqueId,
         messageType: MessageType.TEXT,
         status: MessageStatus.SENT,
-        protocolVersion: '1.0',
-        isPreKeyMessage: false,
         ciphertext: content,
+        nonce: nonce,
       },
     });
 
     const serverCreatedAt = message.createdAt.toISOString();
 
-    // 3. Emit to all users in that conversation
+    //  Emit to all users in that conversation
     client.to(conversationId).emit('receive_message', {
       ...message,
       createdAt: serverCreatedAt,
       status: 'sent',
-      clientTempId,
+      //clientTempId,
     });
 
     return {
@@ -176,7 +177,7 @@ export class WebsocketGateway
     };
   }
 
-  //  TYPING INDICATOR
+  // TYPING INDICATOR
   @SubscribeMessage('typing')
   handleTyping(
     @MessageBody()

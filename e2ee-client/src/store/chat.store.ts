@@ -3,6 +3,19 @@ import { create } from "zustand";
 import api from "@/config/axios";
 import { GetConversationsResponse } from "@/types/loadConversation.type";
 import { ChatMessage } from "@/types/message.type";
+import { ensureSession } from "@/lib/libsodium/services/ensureSession";
+import { decryptMessage } from "@/lib/libsodium/decrypt";
+
+type IncomingEncryptedMessage = {
+  id: string;
+  conversationId: string;
+  senderId: string;
+  ciphertext: string;
+  nonce: string;
+  createdAt: string;
+  clientTempId?: string;
+  status?: string;
+};
 
 const getTimestamp = (createdAt: string): number => {
   const ts = Date.parse(createdAt);
@@ -66,7 +79,7 @@ type ChatStore = {
   loadMessages: (conversationId: string) => Promise<void>;
   markSocketConnected: (connected: boolean) => void;
 };
-export const useChatStore = create<ChatStore>((set) => ({
+export const useChatStore = create<ChatStore>((set, get) => ({
   // state
   conversations: [],
   activeConversationId: null,
@@ -117,23 +130,93 @@ export const useChatStore = create<ChatStore>((set) => ({
       };
     }),
 
+  // loadMessages: async (conversationId) => {
+  //   try {
+  //     const { data } = await api.get<ChatMessage[]>("/api/conversation/loadchats", {
+  //       params: { conversationId },
+  //     });
+  //
+  //     set((state) => ({
+  //       messagesByConversation: {
+  //         ...state.messagesByConversation,
+  //         [conversationId]: upsertMessages(
+  //           state.messagesByConversation[conversationId] || [],
+  //           data ?? []
+  //         ),
+  //       },
+  //     }));
+  //   } catch (err) {
+  //     const error = err as AxiosError;
+  //     console.error(
+  //       `Failed to fetch messages for conversation ${conversationId}:`,
+  //       error.response?.data || error.message
+  //     );
+  //   }
+  // },
+  //
   loadMessages: async (conversationId) => {
     try {
-      const { data } = await api.get<ChatMessage[]>("/api/conversation/loadchats", {
-        params: { conversationId },
-      });
+      const { data } = await api.get<IncomingEncryptedMessage[]>(
+        "/api/conversation/loadchats",
+        {
+          params: { conversationId },
+        }
+      );
+
+      const activeConversation = get().conversations.find((c) => c.conversationId === conversationId)
+
+      console.log("activeConversation", activeConversation)
+      const peerUserId = activeConversation?.participant.uniqueUserId;
+      console.log("peerUserId", peerUserId)
+
+      if (!peerUserId) {
+        console.warn(
+          "peer user id missing"
+        );
+        return;
+      }
+
+      const sessionKey = await ensureSession(
+        conversationId,
+        peerUserId
+      );
+      console.log("sessionKey in store ", sessionKey)
+
+      const decryptedMessages: ChatMessage[] =
+        await Promise.all(
+          data.map(async (message) => {
+            const plaintext = await decryptMessage(
+              message.ciphertext,
+              message.nonce,
+              sessionKey
+            );
+
+            return {
+              id: message.id,
+              conversationId: message.conversationId,
+              senderId: message.senderId,
+              content: plaintext,
+              nonce: message.nonce,
+              createdAt: message.createdAt,
+              clientTempId: message.clientTempId,
+              status:
+                message.status?.toLowerCase() as ChatMessage["status"],
+            };
+          })
+        );
 
       set((state) => ({
         messagesByConversation: {
           ...state.messagesByConversation,
           [conversationId]: upsertMessages(
             state.messagesByConversation[conversationId] || [],
-            data ?? []
+            decryptedMessages
           ),
         },
       }));
     } catch (err) {
       const error = err as AxiosError;
+
       console.error(
         `Failed to fetch messages for conversation ${conversationId}:`,
         error.response?.data || error.message

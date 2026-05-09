@@ -3,13 +3,22 @@
 import React, { useState, type ChangeEvent } from "react";
 import { useSendMessage } from "@/hooks/useSendMessage";
 import { useParams } from "next/navigation"
+import { useChatStore } from "@/store/chat.store";
 
 export default function ChatInputBox() {
   const [content, setContent] = useState<string>("");
   const { sendMessage } = useSendMessage();
+  const conversations = useChatStore((s) => s.conversations)
 
   const params = useParams<{ id: string }>();
   const convId = params.id; // we are getting the conversationId from parameteer of the url 
+
+  const activeConversation = conversations.find(
+    (c) => c.conversationId === convId
+  );
+  if (!activeConversation) return null;
+  const receiverId: string = activeConversation.participant.uniqueUserId
+
 
   const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setContent(event.target.value)
@@ -40,6 +49,7 @@ export default function ChatInputBox() {
       sendMessage({
         conversationId: convId,
         content: content,
+        receiverId: receiverId
       });
       setContent("");
     } catch {

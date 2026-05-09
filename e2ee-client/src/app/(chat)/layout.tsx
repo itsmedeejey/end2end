@@ -8,6 +8,9 @@ import { useInitAuth } from "@/hooks/useInitAuth";
 import { useSocketInit } from "@/hooks/useSocketInit";
 import { useSocketConnection } from "@/hooks/useSocketConnection";
 import SearchBar from "@/components/searchBar";
+import SodiumProvider from "@/provider/sodiumProvider";
+
+
 
 export default function ChatLayout({
   children,
@@ -56,5 +59,9 @@ export default function ChatLayout({
       </div>
     );
 
-  return content;
+  return (
+    <SodiumProvider>
+      {content}
+    </SodiumProvider>
+  );
 }
