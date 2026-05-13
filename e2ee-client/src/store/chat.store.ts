@@ -62,6 +62,7 @@ type ChatStore = {
   messagesByConversation: Record<string, ChatMessage[]>;
   socketConnected: boolean;
   isSearchOpen: boolean;
+  isProfileOpen: boolean;
 
   updateMessage: (
     messageId: string,
@@ -73,6 +74,7 @@ type ChatStore = {
   setConversations: (convs: GetConversationsResponse) => void;
   setActiveConversationId: (id: string | null) => void;
   setIsSearchOpen: (open: boolean) => void;
+  setIsProfileOpen: (open: boolean) => void;
   loadConversations: () => Promise<void>;
   setMessages: (conversationId: string, messages: ChatMessage[]) => void;
   appendMessage: (message: ChatMessage) => void;
@@ -86,12 +88,13 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   messagesByConversation: {},
   socketConnected: false,
   isSearchOpen: false,
+  isProfileOpen: false,
 
   // actions
   setConversations: (convs) => set({ conversations: convs }),
-
   setActiveConversationId: (id) => set({ activeConversationId: id }),
-  setIsSearchOpen: (open) => set({ isSearchOpen: open }),
+  setIsSearchOpen: (open: boolean) => set({ isSearchOpen: open }),
+  setIsProfileOpen: (open: boolean) => set({ isProfileOpen: open }),
 
   loadConversations: async () => {
     try {
@@ -130,30 +133,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
       };
     }),
 
-  // loadMessages: async (conversationId) => {
-  //   try {
-  //     const { data } = await api.get<ChatMessage[]>("/api/conversation/loadchats", {
-  //       params: { conversationId },
-  //     });
-  //
-  //     set((state) => ({
-  //       messagesByConversation: {
-  //         ...state.messagesByConversation,
-  //         [conversationId]: upsertMessages(
-  //           state.messagesByConversation[conversationId] || [],
-  //           data ?? []
-  //         ),
-  //       },
-  //     }));
-  //   } catch (err) {
-  //     const error = err as AxiosError;
-  //     console.error(
-  //       `Failed to fetch messages for conversation ${conversationId}:`,
-  //       error.response?.data || error.message
-  //     );
-  //   }
-  // },
-  //
+
   loadMessages: async (conversationId) => {
     try {
       const { data } = await api.get<IncomingEncryptedMessage[]>(
