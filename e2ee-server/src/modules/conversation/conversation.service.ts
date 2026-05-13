@@ -125,25 +125,19 @@ export class ConversationService {
       },
     });
 
-    const conversations = res
-      .map((conv): GetConversationsResponse[number] | null => {
-        const participant = conv.members[0]?.user;
+    const conversations = res.map((conv): GetConversationsResponse[number] | null => {
+      const participant = conv.members[0]?.user;
 
-        if (!participant) {
-          return null;
-        }
-
-        return {
-          conversationId: conv.id,
-          participant,
-        };
-      })
-      .filter(
-        (
-          conversation,
-        ): conversation is GetConversationsResponse[number] =>
-          conversation !== null,
-      );
+      if (!participant) {
+        return null;
+      }
+      return {
+        conversationId: conv.id,
+        participant,
+      };
+    }).filter(
+      (conversation,): conversation is GetConversationsResponse[number] => conversation !== null,
+    );
 
     return conversations;
   }
