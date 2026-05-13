@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useAuthStore } from "@/store/auth.store";
 import { Copy, Check } from "lucide-react";
 
+
 export default function ProfileCard() {
   const name = useAuthStore((s) => s.name);
   const uniqueUserId = useAuthStore((s) => s.uniqueUserId);
