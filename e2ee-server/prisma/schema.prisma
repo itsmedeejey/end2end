@@ -49,11 +49,18 @@ model Conversation {
   // Unique key for user pair (sorted)
   directConversationKey String @unique
 
+  lastMessageId String?
+  lastMessageAt DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  members  ConversationMember[]
-  messages Message[]
+  members     ConversationMember[]
+  messages    Message[] @relation("ConversationMessages")
+  lastMessage Message?  @relation("ConversationLastMessage", fields: [lastMessageId], references: [id], onDelete: SetNull)
+
+  @@index([updatedAt])
+  @@index([lastMessageAt])
 }
 
 // CONVERSATION MEMBERS
@@ -65,11 +72,15 @@ model ConversationMember {
   userId         String
 
   joinedAt DateTime @default(now())
+  lastReadMessageId String?
+  lastReadAt        DateTime?
 
   conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([conversationId, userId])
+  @@index([userId])
+  @@index([conversationId])
 }
 
 // MESSAGES
@@ -89,10 +100,12 @@ model Message {
   deliveredAt DateTime?
   seenAt      DateTime?
 
-  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  sender       User         @relation(fields: [senderId], references: [uniqueUserId], onDelete: Cascade)
+  conversation   Conversation   @relation("ConversationMessages", fields: [conversationId], references: [id], onDelete: Cascade)
+  sender         User           @relation(fields: [senderId], references: [uniqueUserId], onDelete: Cascade)
+  lastMessageFor Conversation[] @relation("ConversationLastMessage")
 
   @@index([conversationId, createdAt])
+  @@index([conversationId, id])
   @@index([senderId])
 }
 

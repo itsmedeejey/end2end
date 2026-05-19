@@ -3,7 +3,7 @@
 import { openDB, IDBPDatabase } from "idb";
 
 const DB_NAME = "e2ee-chat";
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 let dbInstance: Promise<IDBPDatabase> | null =
   null;
@@ -20,7 +20,7 @@ export async function getDB() {
       DB_NAME,
       DB_VERSION,
       {
-        upgrade(db) {
+        upgrade(db, _oldVersion, _newVersion, tx) {
 
           // identity
           if (
@@ -94,6 +94,17 @@ export async function getDB() {
               "lastMessageId",
               "lastMessageId"
             );
+
+            conversationStore.createIndex(
+              "updatedAt",
+              "updatedAt"
+            );
+          } else {
+            const conversationStore = tx.objectStore("conversations");
+
+            if (!conversationStore.indexNames.contains("updatedAt")) {
+              conversationStore.createIndex("updatedAt", "updatedAt");
+            }
           }
         },
       }

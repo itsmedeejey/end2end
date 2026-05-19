@@ -2,9 +2,10 @@ import { Module } from '@nestjs/common';
 import { WebsocketGateway } from './websocket.gateway';
 import { MessageService } from './services/message.service';
 import { AuthModule } from '../auth/auth.module';
+import { ConversationModule } from '../conversation/conversation.module';
 
 @Module({
-  imports: [AuthModule],
+  imports: [AuthModule, ConversationModule],
   providers: [WebsocketGateway, MessageService],
   exports: [WebsocketGateway]
 })

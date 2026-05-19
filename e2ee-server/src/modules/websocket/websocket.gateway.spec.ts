@@ -1,6 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { JwtService } from '@nestjs/jwt';
+import { PrismaService } from 'src/database/prisma.service';
+import { TokenService } from '../auth/token.service';
+import { ConversationService } from '../conversation/conversation.service';
 import { WebsocketGateway } from './websocket.gateway';
+
+jest.mock('uuid', () => ({
+  v7: jest.fn(() => 'message-id'),
+}));
 
 describe('WebsocketGateway', () => {
   let gateway: WebsocketGateway;
@@ -10,10 +16,16 @@ describe('WebsocketGateway', () => {
       providers: [
         WebsocketGateway,
         {
-          provide: JwtService,
-          useValue: {
-            verifyAsync: jest.fn(),
-          },
+          provide: PrismaService,
+          useValue: {},
+        },
+        {
+          provide: TokenService,
+          useValue: {},
+        },
+        {
+          provide: ConversationService,
+          useValue: {},
         },
       ],
     }).compile();

@@ -1,6 +1,7 @@
 "use client";
 
 import { ChatMessage } from "@/types/message.type";
+import { ConversationConnection } from "@/types/loadConversation.type";
 import { getDB } from "./db";
 
 const MESSAGE_STORE = "messages";
@@ -24,6 +25,22 @@ export async function saveMessages(
     tx.store.put(msg);
   }
 
+  await tx.done;
+}
+
+export async function replaceMessage(
+  oldMessageId: string,
+  message: ChatMessage
+) {
+  const db = await getDB();
+
+  const tx = db.transaction(
+    MESSAGE_STORE,
+    "readwrite"
+  );
+
+  await tx.store.delete(oldMessageId);
+  await tx.store.put(message);
   await tx.done;
 }
 
@@ -68,6 +85,38 @@ export async function getLatestMessage(
   );
 
   return cursor?.value || null;
+}
+
+export async function getLatestSyncedMessage(
+  conversationId: string
+) {
+  const db = await getDB();
+
+  const tx = db.transaction(MESSAGE_STORE);
+
+  const index = tx.store.index(
+    "conversationId-id"
+  );
+
+  let cursor = await index.openCursor(
+    IDBKeyRange.bound(
+      [conversationId, ""],
+      [conversationId, "\uffff"]
+    ),
+    "prev"
+  );
+
+  while (cursor) {
+    const message = cursor.value as ChatMessage;
+
+    if (!message.id.startsWith("local-")) {
+      return message;
+    }
+
+    cursor = await cursor.continue();
+  }
+
+  return null;
 }
 
 //GET OLDEST
@@ -193,5 +242,55 @@ export async function deleteConversationMessages(
     cursor = await cursor.continue();
   }
 
+  await tx.done;
+}
+
+export async function saveConversations(
+  conversations: ConversationConnection[]
+) {
+  const db = await getDB();
+
+  const tx = db.transaction(
+    CONVERSATION_STORE,
+    "readwrite"
+  );
+
+  for (const conversation of conversations) {
+    tx.store.put(conversation);
+  }
+
+  await tx.done;
+}
+
+export async function getCachedConversations(
+  limit = 100
+): Promise<ConversationConnection[]> {
+  const db = await getDB();
+
+  const tx = db.transaction(CONVERSATION_STORE);
+  const index = tx.store.index("updatedAt");
+  const conversations: ConversationConnection[] = [];
+
+  let cursor = await index.openCursor(null, "prev");
+
+  while (cursor && conversations.length < limit) {
+    conversations.push(cursor.value);
+    cursor = await cursor.continue();
+  }
+
+  return conversations;
+}
+
+export async function updateConversationCache(
+  conversation: ConversationConnection
+) {
+  const db = await getDB();
+
+  const tx = db.transaction(
+    CONVERSATION_STORE,
+    "readwrite"
+  );
+
+  await tx.store.put(conversation);
   await tx.done;
 }

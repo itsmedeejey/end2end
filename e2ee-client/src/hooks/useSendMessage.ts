@@ -6,6 +6,7 @@ import { useAuthStore } from "@/store/auth.store";
 import { ensureSession } from "@/lib/libsodium/services/ensureSession";
 import { encryptMessage } from "@/lib/libsodium/encrypt";
 import { ChatMessage } from "@/types/message.type";
+import { replaceMessage, saveMessages } from "@/lib/idb/chat-db";
 
 
 type SendMessagePayload = {
@@ -18,6 +19,9 @@ type SendMessagePayload = {
 export const useSendMessage = () => {
   const appendMessage = useChatStore((s) => s.appendMessage);
   const updateMessage = useChatStore((s) => s.updateMessage);
+  const updateConversationFromMessage = useChatStore(
+    (s) => s.updateConversationFromMessage
+  );
 
   const userId = useAuthStore((s) => s.uniqueUserId);
   const status = useAuthStore((s) => s.status);
@@ -44,9 +48,12 @@ export const useSendMessage = () => {
     };
 
     appendMessage(optimisticMessage);
+    updateConversationFromMessage(optimisticMessage, userId, true);
+    await saveMessages([optimisticMessage]);
 
     if (!socket.connected) {
       updateMessage(tempId, { status: "failed" });
+      await saveMessages([{ ...optimisticMessage, status: "failed" }]);
       return;
     }
 
@@ -55,7 +62,7 @@ export const useSendMessage = () => {
       const encrypted = await encryptMessage(payload.content, sessionKey)
 
       socket.emit(
-        "send_message",
+        "message:new",
         {
           conversationId: payload.conversationId,
           cipherText: encrypted.ciphertext,
@@ -79,16 +86,34 @@ export const useSendMessage = () => {
             return;
           }
 
+          const reconciledMessage: ChatMessage = {
+            ...optimisticMessage,
+            id: ack.messageId,
+            createdAt: ack.createdAt,
+            clientTempId: ack.clientTempId,
+            ciphertext: encrypted.ciphertext,
+            nonce: encrypted.nonce,
+            status: "sent",
+          };
+
           // reconcile
           updateMessage(ack.clientTempId, {
             id: ack.messageId,
             createdAt: ack.createdAt,
             clientTempId: ack.clientTempId,
+            ciphertext: encrypted.ciphertext,
+            nonce: encrypted.nonce,
             status: "sent",
           });
+          updateConversationFromMessage(reconciledMessage, userId, true);
+          void replaceMessage(tempId, reconciledMessage);
         }
       );
-    } catch (err) { console.log(err) }
+    } catch (err) {
+      console.error(err);
+      updateMessage(tempId, { status: "failed" });
+      await saveMessages([{ ...optimisticMessage, status: "failed" }]);
+    }
   };
 
   return { sendMessage };
