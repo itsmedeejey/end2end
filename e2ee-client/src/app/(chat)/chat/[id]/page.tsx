@@ -8,6 +8,7 @@ import { useAuthStore } from "@/store/auth.store";
 import ChatUi from "@/components/chatUi";
 import { useEffect, useMemo, useRef } from "react";
 import { useChatSocket } from "@/hooks/useChatSocket";
+import useConversationMsg from "@/hooks/useConversationMsg";
 
 
 export default function Chat() {
@@ -16,7 +17,6 @@ export default function Chat() {
 
   const conversations = useChatStore((s) => s.conversations);
   const messagesByConversation = useChatStore((s) => s.messagesByConversation);
-  const loadMessages = useChatStore((s) => s.loadMessages);
   const setActiveConversationId = useChatStore((s) => s.setActiveConversationId);
   const socketConnected = useChatStore((s) => s.socketConnected);
   const currentUserId = useAuthStore((s) => s.uniqueUserId);
@@ -29,6 +29,7 @@ export default function Chat() {
   const previousConversationIdRef = useRef<string | null>(null);
   const previousMessageCountRef = useRef(0);
 
+  useConversationMsg(conversationId)
 
   //when a new conversatioin is added this connects the user to the that converstion room
   useEffect(() => {
@@ -46,11 +47,10 @@ export default function Chat() {
 
     setActiveConversationId(conversationId);
 
-    loadMessages(conversationId);
     return () => {
       leaveConversation(conversationId);
     };
-  }, [conversationId, loadMessages, setActiveConversationId, leaveConversation]);
+  }, [conversationId, setActiveConversationId, leaveConversation]);
 
   const activeConversation = conversations.find(
     (c) => c.conversationId === conversationId
@@ -85,13 +85,12 @@ export default function Chat() {
     if (!conversationId || socketConnected) return;
 
     const intervalId = window.setInterval(() => {
-      loadMessages(conversationId);
     }, 4000);
 
     return () => {
       window.clearInterval(intervalId);
     };
-  }, [conversationId, socketConnected, loadMessages]);
+  }, [conversationId, socketConnected]);
 
 
   // Auto-scroll on initial load / conversation switch / incoming new messages.

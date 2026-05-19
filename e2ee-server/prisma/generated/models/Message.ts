@@ -292,7 +292,7 @@ export type MessageScalarWhereWithAggregatesInput = {
 }
 
 export type MessageCreateInput = {
-  id?: string
+  id: string
   ciphertext: string
   nonce: string
   messageType: $Enums.MessageType
@@ -305,7 +305,7 @@ export type MessageCreateInput = {
 }
 
 export type MessageUncheckedCreateInput = {
-  id?: string
+  id: string
   conversationId: string
   senderId: string
   ciphertext: string
@@ -344,7 +344,7 @@ export type MessageUncheckedUpdateInput = {
 }
 
 export type MessageCreateManyInput = {
-  id?: string
+  id: string
   conversationId: string
   senderId: string
   ciphertext: string
@@ -526,7 +526,7 @@ export type NullableDateTimeFieldUpdateOperationsInput = {
 }
 
 export type MessageCreateWithoutSenderInput = {
-  id?: string
+  id: string
   ciphertext: string
   nonce: string
   messageType: $Enums.MessageType
@@ -538,7 +538,7 @@ export type MessageCreateWithoutSenderInput = {
 }
 
 export type MessageUncheckedCreateWithoutSenderInput = {
-  id?: string
+  id: string
   conversationId: string
   ciphertext: string
   nonce: string
@@ -592,7 +592,7 @@ export type MessageScalarWhereInput = {
 }
 
 export type MessageCreateWithoutConversationInput = {
-  id?: string
+  id: string
   ciphertext: string
   nonce: string
   messageType: $Enums.MessageType
@@ -604,7 +604,7 @@ export type MessageCreateWithoutConversationInput = {
 }
 
 export type MessageUncheckedCreateWithoutConversationInput = {
-  id?: string
+  id: string
   senderId: string
   ciphertext: string
   nonce: string
@@ -642,7 +642,7 @@ export type MessageUpdateManyWithWhereWithoutConversationInput = {
 }
 
 export type MessageCreateManySenderInput = {
-  id?: string
+  id: string
   conversationId: string
   ciphertext: string
   nonce: string
@@ -690,7 +690,7 @@ export type MessageUncheckedUpdateManyWithoutSenderInput = {
 }
 
 export type MessageCreateManyConversationInput = {
-  id?: string
+  id: string
   senderId: string
   ciphertext: string
   nonce: string

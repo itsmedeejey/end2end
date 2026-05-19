@@ -62,6 +62,8 @@ export class AuthController {
     return safeResult;
   }
 
+
+  // get auth/me
   @Get("me")
   @UseGuards(JwtAuthGuard)
   getProfile(@Req() req: Request) {

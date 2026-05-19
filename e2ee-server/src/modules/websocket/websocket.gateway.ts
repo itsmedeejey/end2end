@@ -16,6 +16,7 @@ import { JwtPayload } from '../auth/types/jwt-payload.type';
 import { TokenService } from '../auth/token.service';
 import * as cookie from 'cookie';
 import { SendMessageDto } from './dto/sendMessage.dto';
+import { v7 as uuidV7 } from 'uuid';
 
 interface GatewaySocketData {
   user?: JwtPayload;
@@ -150,6 +151,7 @@ export class WebsocketGateway
     //  Save message
     const message = await this.prisma.message.create({
       data: {
+        id: uuidV7(), // here we a usign uuidV7 which is time sortable 
         conversationId,
         senderId: userUniqueId,
         messageType: MessageType.TEXT,

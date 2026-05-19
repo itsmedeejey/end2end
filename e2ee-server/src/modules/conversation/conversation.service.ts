@@ -142,6 +142,8 @@ export class ConversationService {
     return conversations;
   }
 
+
+
   async GetChats(
     currentUserId: string,
     conversationId: string,
@@ -187,5 +189,59 @@ export class ConversationService {
     return messages;
   }
 
+
+  // syncing new messages
+  async syncNewMessage(
+    currentUserId: string,
+    conversationId: string,
+    msgId: string
+  ): Promise<GetChatsResponse> {
+
+    if (!conversationId?.trim()) {
+      throw new BadRequestException('conversationId is required');
+    }
+
+    const membership = await this.prisma.conversationMember.findUnique({
+      where: {
+        conversationId_userId: {
+          conversationId,
+          userId: currentUserId,
+        },
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!membership) {
+      throw new NotFoundException('Conversation not found');
+    }
+
+    const messages = await this.prisma.message.findMany({
+      where: {
+        conversationId,
+        id: {
+          gt: msgId
+        },
+      },
+      orderBy: {
+        id: 'asc',
+      },
+
+      take: 50,
+
+      select: {
+        id: true,
+        conversationId: true,
+        senderId: true,
+        ciphertext: true,
+        nonce: true,
+        createdAt: true,
+        status: true,
+      },
+    });
+
+    return messages
+  }
 
 }
