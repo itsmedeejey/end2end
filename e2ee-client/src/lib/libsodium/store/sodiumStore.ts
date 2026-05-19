@@ -1,42 +1,11 @@
 "use client";
 
-import { openDB, IDBPDatabase } from "idb";
-
-const DB_NAME = "e2ee-chat";
-const DB_VERSION = 1;
+import { getDB } from "@/lib/idb/db";
 
 const IDENTITY_STORE = "identity";
 const SESSION_STORE = "sessions";
 
-// Database cache
-let dbInstance: Promise<IDBPDatabase> | null = null;
 
-// Lazy DB initializer
-async function getDB() {
-  if (typeof window === "undefined") {
-    throw new Error("indexedDB unavailable on server");
-  }
-
-  if (!dbInstance) {
-    dbInstance = openDB(DB_NAME, DB_VERSION, {
-      upgrade(db) {
-        // Identity store
-        if (!db.objectStoreNames.contains(IDENTITY_STORE)) {
-          db.createObjectStore(IDENTITY_STORE);
-        }
-
-        // Session store
-        if (!db.objectStoreNames.contains(SESSION_STORE)) {
-          db.createObjectStore(SESSION_STORE, {
-            keyPath: "conversationId",
-          });
-        }
-      },
-    });
-  }
-
-  return dbInstance;
-}
 
 //Identity Keys
 

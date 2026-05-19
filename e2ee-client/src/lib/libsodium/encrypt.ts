@@ -13,14 +13,13 @@ export async function encryptMessage(
     sodium.crypto_aead_xchacha20poly1305_ietf_NPUBBYTES
   );
 
-  const cipher =
-    sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(
-      plaintext,
-      null,
-      null,
-      nonce,
-      key
-    );
+  const cipher = sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(
+    plaintext,
+    null,
+    null,
+    nonce,
+    key
+  );
 
   return {
     ciphertext: sodium.to_base64(

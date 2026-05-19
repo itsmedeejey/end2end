@@ -16,6 +16,8 @@ import { JwtPayload } from '../auth/types/jwt-payload.type';
 import { TokenService } from '../auth/token.service';
 import * as cookie from 'cookie';
 import { SendMessageDto } from './dto/sendMessage.dto';
+import { v7 as uuidV7 } from 'uuid';
+import { ConversationService } from '../conversation/conversation.service';
 
 interface GatewaySocketData {
   user?: JwtPayload;
@@ -43,6 +45,7 @@ export class WebsocketGateway
   constructor(
     private readonly prisma: PrismaService,
     private readonly tokenService: TokenService,
+    private readonly conversationService: ConversationService,
   ) { }
 
   private getSocketUser(client: Socket): JwtPayload | undefined {
@@ -103,12 +106,52 @@ export class WebsocketGateway
     }
   }
 
-  @SubscribeMessage("join:conversation")
+  @SubscribeMessage('conversation:join')
   async handleJoinConversation(
     @MessageBody() conversationId: string,
     @ConnectedSocket() client: Socket,
   ) {
+    const user = this.getRequiredSocketUser(client);
+
+    const membership = await this.prisma.conversationMember.findUnique({
+      where: {
+        conversationId_userId: {
+          conversationId,
+          userId: user.sub,
+        },
+      },
+      select: { id: true },
+    });
+
+    if (!membership) {
+      throw new WsException('Not a member of this conversation');
+    }
+
     await client.join(conversationId);
+  }
+
+  @SubscribeMessage('join:conversation')
+  async handleLegacyJoinConversation(
+    @MessageBody() conversationId: string,
+    @ConnectedSocket() client: Socket,
+  ) {
+    return this.handleJoinConversation(conversationId, client);
+  }
+
+  @SubscribeMessage('conversation:leave')
+  async handleLeaveConversation(
+    @MessageBody() conversationId: string,
+    @ConnectedSocket() client: Socket,
+  ) {
+    await client.leave(conversationId);
+  }
+
+  @SubscribeMessage('leave:conversation')
+  async handleLegacyLeaveConversation(
+    @MessageBody() conversationId: string,
+    @ConnectedSocket() client: Socket,
+  ) {
+    return this.handleLeaveConversation(conversationId, client);
   }
 
   // DISCONNECT HANDLER
@@ -121,8 +164,8 @@ export class WebsocketGateway
   }
 
   // SEND MESSAGE
-  @SubscribeMessage('send_message')
-  async handleSendMessage(
+  @SubscribeMessage('message:new')
+  async handleNewMessage(
     @MessageBody() data: SendMessageDto,
     @ConnectedSocket() client: Socket,
   ) {
@@ -147,27 +190,63 @@ export class WebsocketGateway
       throw new WsException('Not a member of this conversation');
     }
 
-    //  Save message
-    const message = await this.prisma.message.create({
-      data: {
-        conversationId,
-        senderId: userUniqueId,
-        messageType: MessageType.TEXT,
-        status: MessageStatus.SENT,
-        ciphertext: content,
-        nonce: nonce,
-      },
+    const message = await this.prisma.$transaction(async (tx) => {
+      const created = await tx.message.create({
+        data: {
+          id: uuidV7(), // UUIDv7 keeps message ids chronologically sortable.
+          conversationId,
+          senderId: userUniqueId,
+          messageType: MessageType.TEXT,
+          status: MessageStatus.SENT,
+          ciphertext: content,
+          nonce: nonce,
+        },
+      });
+
+      await tx.conversation.update({
+        where: { id: conversationId },
+        data: {
+          lastMessageId: created.id,
+          lastMessageAt: created.createdAt,
+          updatedAt: created.createdAt,
+        },
+      });
+
+      return created;
     });
 
     const serverCreatedAt = message.createdAt.toISOString();
-
-    //  Emit to all users in that conversation
-    client.to(conversationId).emit('receive_message', {
-      ...message,
+    const messagePayload = {
+      id: message.id,
+      conversationId: message.conversationId,
+      senderId: message.senderId,
+      ciphertext: message.ciphertext,
+      nonce: message.nonce,
       createdAt: serverCreatedAt,
       status: 'sent',
-      //clientTempId,
+      clientTempId,
+    };
+
+    const conversationPayload = {
+      id: conversationId,
+      conversationId,
+      lastMessageId: message.id,
+      lastMessageAt: serverCreatedAt,
+      lastMessageSenderId: message.senderId,
+      updatedAt: serverCreatedAt,
+    };
+
+    this.server.to(conversationId).emit('message:new', messagePayload);
+    this.server.to(conversationId).emit('conversation:update', conversationPayload);
+    client.emit('message:ack', {
+      status: 'ok',
+      messageId: message.id,
+      createdAt: serverCreatedAt,
+      clientTempId,
     });
+
+    // Legacy event kept temporarily for older clients during rollout.
+    client.to(conversationId).emit('receive_message', messagePayload);
 
     return {
       status: 'ok',
@@ -175,6 +254,69 @@ export class WebsocketGateway
       createdAt: serverCreatedAt,
       clientTempId,
     };
+  }
+
+  @SubscribeMessage('send_message')
+  async handleLegacySendMessage(
+    @MessageBody() data: SendMessageDto,
+    @ConnectedSocket() client: Socket,
+  ) {
+    return this.handleNewMessage(data, client);
+  }
+
+  @SubscribeMessage('message:sync')
+  async handleMessageSync(
+    @MessageBody()
+    data: {
+      conversationId: string;
+      after?: string;
+      limit?: number;
+    },
+    @ConnectedSocket() client: Socket,
+  ) {
+    const user = this.getRequiredSocketUser(client);
+
+    const messages = await this.conversationService.syncMessagesAfter(
+      user.sub,
+      data.conversationId,
+      data.after,
+      data.limit ?? 50,
+    );
+
+    return { messages };
+  }
+
+  @SubscribeMessage('conversation:read')
+  async handleConversationRead(
+    @MessageBody()
+    data: {
+      conversationId: string;
+      messageId?: string;
+    },
+    @ConnectedSocket() client: Socket,
+  ) {
+    const user = this.getRequiredSocketUser(client);
+
+    const latestMessageId = data.messageId ?? (await this.prisma.message.findFirst({
+      where: { conversationId: data.conversationId },
+      orderBy: { id: 'desc' },
+      select: { id: true },
+    }))?.id;
+
+    await this.prisma.conversationMember.update({
+      where: {
+        conversationId_userId: {
+          conversationId: data.conversationId,
+          userId: user.sub,
+        },
+      },
+      data: {
+        lastReadMessageId: latestMessageId,
+        lastReadAt: new Date(),
+      },
+    });
+
+    return { ok: true };
   }
 
   // TYPING INDICATOR

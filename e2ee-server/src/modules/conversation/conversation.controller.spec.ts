@@ -1,6 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import type { Request } from 'express';
 import { ConversationController } from './conversation.controller';
 import { ConversationService } from './conversation.service';
+import { JwtPayload } from '../auth/types/jwt-payload.type';
 
 describe('ConversationController', () => {
   let controller: ConversationController;
@@ -33,24 +35,32 @@ describe('ConversationController', () => {
   it('returns conversation id with user details', async () => {
     conversationService.findOrCreateConversationId.mockResolvedValue({
       conversationId: 'conversation-1',
-      user: {
+      participant: {
         displayName: 'Alice',
         uniqueUserId: 'alice123',
       },
     });
 
+    const req = {
+      user: {
+        sub: 'current-user-id',
+        uid: 'current-user-uid',
+        name: 'Current User',
+      },
+    } as Request & { user: JwtPayload };
+
     const result = await controller.findOrCreateConversation(
       { to: 'alice123' },
-      { user: { sub: 'current-user-id' } } as any,
+      req,
     );
 
-    expect(conversationService.findOrCreateConversationId).toHaveBeenCalledWith(
+    expect(conversationService.findOrCreateConversationId.mock.calls).toContainEqual([
       'alice123',
       'current-user-id',
-    );
+    ]);
     expect(result).toEqual({
       conversationId: 'conversation-1',
-      user: {
+      participant: {
         displayName: 'Alice',
         uniqueUserId: 'alice123',
       },

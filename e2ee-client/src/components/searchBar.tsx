@@ -18,7 +18,6 @@ export default function SearchBar() {
   const setIsSearchOpen = useChatStore((state) => state.setIsSearchOpen);
   const addConversation = useChatStore((state) => state.addConversation)
   const setActiveConversation = useChatStore((state) => state.setActiveConversationId)
-  const loadMessages = useChatStore((state) => state.loadMessages)
 
 
   const [UserId, setUserId] = useState("");
@@ -51,7 +50,6 @@ export default function SearchBar() {
           participant: user
         });
         setActiveConversation(conversationId);
-        loadMessages(conversationId);
         router.push(`/chat/${conversationId}`);
         setIsSearchOpen(false);
       }

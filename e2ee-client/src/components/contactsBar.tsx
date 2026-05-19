@@ -30,6 +30,8 @@ export default function ContactsBar() {
           <ContactsCard
             key={conversation.conversationId}
             displayName={conversation.participant.displayName}
+            lastMessageText={conversation.lastMessageText}
+            unreadCount={conversation.unreadCount}
             onClick={() => handleConversationClick(conversation)}
           />
         ))}

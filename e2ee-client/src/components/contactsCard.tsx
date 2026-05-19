@@ -1,10 +1,17 @@
 "use client"
 interface ContactsCardProps {
   displayName: string;
+  lastMessageText?: string | null;
+  unreadCount?: number;
   onClick?: () => void;
 }
 
-export default function ContactsCard({ displayName, onClick }: ContactsCardProps) {
+export default function ContactsCard({
+  displayName,
+  lastMessageText,
+  unreadCount = 0,
+  onClick,
+}: ContactsCardProps) {
 
   return (
     <div>
@@ -20,7 +27,20 @@ export default function ContactsCard({ displayName, onClick }: ContactsCardProps
 
           </div>
 
-          <h1 className="text-sm font-medium">{displayName}</h1>
+          <div className="min-w-0 flex-1">
+            <h1 className="truncate text-sm font-medium">{displayName}</h1>
+            {lastMessageText && (
+              <p className="truncate text-xs text-gray-200">
+                {lastMessageText}
+              </p>
+            )}
+          </div>
+
+          {unreadCount > 0 && (
+            <div className="flex h-5 min-w-5 items-center justify-center rounded-full bg-green-500 px-1.5 text-xs font-semibold text-black">
+              {unreadCount > 99 ? "99+" : unreadCount}
+            </div>
+          )}
 
         </div>
 

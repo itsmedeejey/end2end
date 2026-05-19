@@ -3,6 +3,7 @@ export type ChatMessage = {
   conversationId: string;
   senderId: string;
   content: string;
+  ciphertext?: string;
   nonce?: string;
   createdAt: string;
   clientTempId?: string;
