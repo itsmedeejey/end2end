@@ -114,6 +114,7 @@ type ChatStore = {
   hasMore: Record<string, boolean>;
   socketConnected: boolean;
   isSearchOpen: boolean;
+  isProfileOpen: boolean;
 
   addConversation: (
     conv: Partial<ConversationConnection> & {
@@ -124,6 +125,7 @@ type ChatStore = {
   setConversations: (convs: GetConversationsResponse) => void;
   setActiveConversationId: (id: string | null) => void;
   setIsSearchOpen: (open: boolean) => void;
+  setIsProfileOpen: (open: boolean) => void;
   loadConversations: () => Promise<void>;
   setMessages: (conversationId: string, messages: ChatMessage[]) => void;
   appendMessage: (message: ChatMessage) => void;
@@ -158,6 +160,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   hasMore: {},
   socketConnected: false,
   isSearchOpen: false,
+  isProfileOpen: false,
 
   setConversations: (convs) => {
     const normalized = convs.map(buildConversation);

@@ -16,6 +16,9 @@ export default function Chat() {
   const params = useParams<{ id: string }>();
   const conversationId = params.id;
 
+  const setIsProfileOpen = useChatStore((s) => s.setIsProfileOpen)
+  const isProfileOpen = useChatStore((s) => s.isProfileOpen)
+
   const conversations = useChatStore((s) => s.conversations);
   const messagesByConversation = useChatStore((s) => s.messagesByConversation);
   const setActiveConversationId = useChatStore((s) => s.setActiveConversationId);
@@ -125,9 +128,22 @@ export default function Chat() {
 
   return (
     <div className="flex h-full flex-col">
-      <ChatTopBar
-        displayName={activeConversation?.participant.displayName ?? ""}
-      />
+
+      <div onClick={() => setIsProfileOpen(true)}>
+        <ChatTopBar
+          displayName={activeConversation?.participant.displayName ?? ""}
+        />
+      </div>
+
+      {isProfileOpen &&
+        (
+          <div className="p-5">
+            <ContactProfileCard
+              name={activeConversation?.participant.displayName} uniqueUserId={activeConversation?.participant.uniqueUserId}></ContactProfileCard>
+          </div>
+        )
+      }
+
 
       <div ref={scrollRef} className="flex-1 overflow-y-scroll">
         {loadingOlder && (
