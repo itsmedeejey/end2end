@@ -4,171 +4,168 @@ import { useEffect } from "react";
 import { getSocket } from "@/lib/socket/socket";
 import { useChatStore } from "@/store/chat.store";
 import { useAuthStore } from "@/store/auth.store";
-import { ensureSession } from "@/lib/libsodium/services/ensureSession";
-import { decryptMessage } from "@/lib/libsodium/decrypt";
-import { ChatMessage } from "@/types/message.type";
+import { getLatestSyncedMessage, saveMessages } from "@/lib/idb/chat-db";
+import {
+  decryptIncomingMessages,
+  IncomingEncryptedMessage,
+} from "@/lib/chat/messages";
 
-
-type IncomingEncryptedMessage = {
-  id: string;
-  conversationId: string;
-  senderId: string;
-  ciphertext: string;
-  nonce: string;
-  createdAt: string;
-  clientTempId?: string;
-  status?:
-  | "sending"
-  | "sent"
-  | "delivered"
-  | "read"
-  | "failed";
+type SyncAck = {
+  messages?: IncomingEncryptedMessage[];
 };
 
-
 export const useSocketConnection = () => {
-
-  const appendMessage = useChatStore((s) => s.appendMessage);
-  const updateMessage = useChatStore((s) => s.updateMessage);
+  const activeConversationId = useChatStore((s) => s.activeConversationId);
+  const appendMessages = useChatStore((s) => s.appendMessages);
+  const conversations = useChatStore((s) => s.conversations);
+  const markConversationRead = useChatStore((s) => s.markConversationRead);
   const markSocketConnected = useChatStore((s) => s.markSocketConnected);
-  const conversations = useChatStore((s) => s.conversations)
-
-
-  const currentUserId = useAuthStore.getState().uniqueUserId;
+  const updateConversationFromMessage = useChatStore(
+    (s) => s.updateConversationFromMessage
+  );
+  const currentUserId = useAuthStore((s) => s.uniqueUserId);
 
   useEffect(() => {
-
     let isMounted = true;
     const socket = getSocket();
 
-    socket.on("connect", () => {
-      console.log(
-        "Socket connected:",
-        socket.id
+    const syncConversation = async (conversationId: string) => {
+      const conversation = conversations.find(
+        (item) => item.conversationId === conversationId
       );
+      const peerUserId = conversation?.participant.uniqueUserId;
 
-      if (isMounted) {
-        markSocketConnected(true);
-      }
-    });
+      if (!peerUserId) return;
 
+      const latest = await getLatestSyncedMessage(conversationId);
 
-    socket.on("disconnect", () => {
-      console.log("Socket disconnected");
-
-      if (isMounted) {
-        markSocketConnected(false);
-      }
-    });
-
-    socket.on(
-      "receive_message",
-      async (message: IncomingEncryptedMessage) => {
-
-        if (!currentUserId) return;
-
-        const activeConversation = conversations.find((c) => c.conversationId === message.conversationId);
-
-        const otherPeerUserId = activeConversation?.participant.uniqueUserId;
-
-        if (!otherPeerUserId) {
-          console.error(
-            "peer user id missing"
-          );
-          return;
-        }
-        const peerUserId = message.senderId === currentUserId ? otherPeerUserId : message.senderId;
-
-        console.log("currentUserId", currentUserId)
-        console.log("otherPeerUserId", otherPeerUserId)
-        console.log("peerUserId", peerUserId)
-        console.log("senderId", message.senderId)
-
-
-        try {
-          const sessionKey = await ensureSession(
-            message.conversationId,
+      socket.emit(
+        "message:sync",
+        {
+          conversationId,
+          after: latest?.id,
+          limit: 50,
+        },
+        async (ack?: SyncAck) => {
+          const encryptedMessages = ack?.messages ?? [];
+          const decryptedMessages = await decryptIncomingMessages(
+            encryptedMessages,
             peerUserId
           );
 
-          const plaintext = await decryptMessage(
-            message.ciphertext,
-            message.nonce,
-            sessionKey
-          );
+          if (decryptedMessages.length === 0) return;
 
-          console.log("decryptMessage", plaintext)
+          await saveMessages(decryptedMessages);
+          appendMessages(conversationId, decryptedMessages);
 
-
-          const normalizedMessage: ChatMessage = {
-            id: message.id,
-            conversationId: message.conversationId,
-            senderId: message.senderId,
-            content: plaintext,
-            nonce: message.nonce,
-            createdAt: message.createdAt,
-            clientTempId: message.clientTempId,
-            status: message.status ?? "sent",
-          };
-
-          console.log("normalizedMessage:", normalizedMessage)
-
-          if (normalizedMessage.clientTempId) {
-
-            updateMessage(
-              normalizedMessage.clientTempId,
-              normalizedMessage
+          for (const message of decryptedMessages) {
+            updateConversationFromMessage(
+              message,
+              currentUserId,
+              message.conversationId === activeConversationId
             );
-
-          } else {
-            appendMessage(normalizedMessage);
           }
-
-        } catch (err) {
-
-          console.error(
-            "failed to decrypt incoming message",
-            err
-          );
         }
+      );
+    };
+
+    const handleConnect = () => {
+      if (isMounted) {
+        markSocketConnected(true);
       }
-    );
 
+      for (const conversation of conversations) {
+        void syncConversation(conversation.conversationId);
+      }
+    };
 
+    const handleDisconnect = () => {
+      if (isMounted) {
+        markSocketConnected(false);
+      }
+    };
 
+    const handleIncomingMessage = async (
+      message: IncomingEncryptedMessage
+    ) => {
+      if (!currentUserId) return;
 
-    socket.on(
-      "connect_error",
-      (err) => {
+      const conversation = conversations.find(
+        (item) => item.conversationId === message.conversationId
+      );
+      const peerUserId = conversation?.participant.uniqueUserId;
 
-        console.error(
-          "Socket error:",
-          err.message
+      if (!peerUserId) {
+        console.error("peer user id missing");
+        return;
+      }
+
+      try {
+        const [normalizedMessage] = await decryptIncomingMessages(
+          [message],
+          peerUserId
         );
 
-        if (err.message === "Unauthorized") {
-          if (isMounted) {
-            markSocketConnected(false);
-          }
-          useAuthStore.getState().clearAuth();
+        if (!normalizedMessage) return;
+
+        await saveMessages([normalizedMessage]);
+        appendMessages(message.conversationId, [normalizedMessage]);
+
+        const isActive = message.conversationId === activeConversationId;
+        updateConversationFromMessage(
+          normalizedMessage,
+          currentUserId,
+          isActive
+        );
+
+        if (isActive) {
+          markConversationRead(message.conversationId);
+          socket.emit("conversation:read", {
+            conversationId: message.conversationId,
+            messageId: message.id,
+          });
         }
+      } catch (err) {
+        console.error("failed to decrypt incoming message", err);
       }
-    );
+    };
+
+    const handleConnectError = (err: Error) => {
+      console.error("Socket error:", err.message);
+
+      if (err.message === "Unauthorized") {
+        if (isMounted) {
+          markSocketConnected(false);
+        }
+        useAuthStore.getState().clearAuth();
+      }
+    };
+
+    socket.on("connect", handleConnect);
+    socket.on("disconnect", handleDisconnect);
+    socket.on("message:new", handleIncomingMessage);
+    socket.on("receive_message", handleIncomingMessage);
+    socket.on("connect_error", handleConnectError);
+
+    if (socket.connected) {
+      handleConnect();
+    }
 
     return () => {
       isMounted = false;
-      socket.off("connect");
-      socket.off("disconnect");
-      socket.off("receive_message");
-      socket.off("connect_error");
+      socket.off("connect", handleConnect);
+      socket.off("disconnect", handleDisconnect);
+      socket.off("message:new", handleIncomingMessage);
+      socket.off("receive_message", handleIncomingMessage);
+      socket.off("connect_error", handleConnectError);
     };
-
-  },
-    [
-      currentUserId,
-      conversations,
-      appendMessage,
-      updateMessage,
-      markSocketConnected,
-    ]);
+  }, [
+    activeConversationId,
+    appendMessages,
+    conversations,
+    currentUserId,
+    markConversationRead,
+    markSocketConnected,
+    updateConversationFromMessage,
+  ]);
 };

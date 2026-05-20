@@ -91,6 +91,8 @@ export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof User
 export const ConversationScalarFieldEnum = {
   id: 'id',
   directConversationKey: 'directConversationKey',
+  lastMessageId: 'lastMessageId',
+  lastMessageAt: 'lastMessageAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -102,7 +104,9 @@ export const ConversationMemberScalarFieldEnum = {
   id: 'id',
   conversationId: 'conversationId',
   userId: 'userId',
-  joinedAt: 'joinedAt'
+  joinedAt: 'joinedAt',
+  lastReadMessageId: 'lastReadMessageId',
+  lastReadAt: 'lastReadAt'
 } as const
 
 export type ConversationMemberScalarFieldEnum = (typeof ConversationMemberScalarFieldEnum)[keyof typeof ConversationMemberScalarFieldEnum]

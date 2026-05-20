@@ -11,13 +11,18 @@ export default function Login() {
 
       {/* left */}
       <div className="w-1/2 flex items-center justify-center bg-gray-200">
-        <h1 className="text-5xl font-sans text-center px-10 ">
-          Privacy is not a{" "}
-          <span className="font-extrabold text-blue-700">LUXURY</span>, it is our{" "}
-          <span className="font-extrabold text-blue-700">RIGHT</span>
-        </h1>
-      </div>
+        <div className="px-10 text-center">
+          <h1 className="text-5xl font-sans font-bold leading-tight">
+            Privacy Without{" "}
+            <span className="text-blue-700 text-7xl">Footprints</span>
+          </h1>
 
+          <p className="mt-6 text-md text-gray-700 max-w-2xl">
+            Secure conversations with zero metadata collection and
+            end-to-end encryption by default.
+          </p>
+        </div>
+      </div>
       {/* right */}
       <div className="w-1/2 bg-gray-900 flex items-center justify-center">
 

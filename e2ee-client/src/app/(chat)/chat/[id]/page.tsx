@@ -6,19 +6,23 @@ import { useParams } from "next/navigation";
 import { useChatStore } from "@/store/chat.store";
 import { useAuthStore } from "@/store/auth.store";
 import ChatUi from "@/components/chatUi";
-import { useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useChatSocket } from "@/hooks/useChatSocket";
+import useConversationMsg from "@/hooks/useConversationMsg";
+import { getSocket } from "@/lib/socket/socket";
+import ContactProfileCard from "@/components/contactProfileCard";
 
 
 export default function Chat() {
   const params = useParams<{ id: string }>();
   const conversationId = params.id;
 
+  const setIsProfileOpen = useChatStore((s) => s.setIsProfileOpen)
+  const isProfileOpen = useChatStore((s) => s.isProfileOpen)
+
   const conversations = useChatStore((s) => s.conversations);
   const messagesByConversation = useChatStore((s) => s.messagesByConversation);
-  const loadMessages = useChatStore((s) => s.loadMessages);
   const setActiveConversationId = useChatStore((s) => s.setActiveConversationId);
-  const socketConnected = useChatStore((s) => s.socketConnected);
   const currentUserId = useAuthStore((s) => s.uniqueUserId);
 
   const { joinConversation, leaveConversation } = useChatSocket();
@@ -29,6 +33,7 @@ export default function Chat() {
   const previousConversationIdRef = useRef<string | null>(null);
   const previousMessageCountRef = useRef(0);
 
+  const { loadOlderMessages, loadingOlder } = useConversationMsg(conversationId)
 
   //when a new conversatioin is added this connects the user to the that converstion room
   useEffect(() => {
@@ -45,12 +50,10 @@ export default function Chat() {
     if (!conversationId) return;
 
     setActiveConversationId(conversationId);
+    getSocket().emit("conversation:read", { conversationId });
 
-    loadMessages(conversationId);
-    return () => {
-      leaveConversation(conversationId);
-    };
-  }, [conversationId, loadMessages, setActiveConversationId, leaveConversation]);
+    return () => setActiveConversationId(null);
+  }, [conversationId, setActiveConversationId]);
 
   const activeConversation = conversations.find(
     (c) => c.conversationId === conversationId
@@ -63,7 +66,22 @@ export default function Chat() {
   );
 
 
-  // auto scrol to bottom
+  const handleLoadOlder = useCallback(async () => {
+    const el = scrollRef.current;
+    if (!el || loadingOlder) return;
+
+    const previousScrollHeight = el.scrollHeight;
+
+    await loadOlderMessages();
+
+    requestAnimationFrame(() => {
+      const current = scrollRef.current;
+      if (!current) return;
+      current.scrollTop = current.scrollHeight - previousScrollHeight;
+    });
+  }, [loadOlderMessages, loadingOlder]);
+
+  // Track bottom proximity and trigger upward infinite scroll.
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
@@ -71,27 +89,16 @@ export default function Chat() {
     const handleScroll = () => {
       wasNearBottomRef.current =
         el.scrollHeight - el.scrollTop - el.clientHeight < 120;
+
+      if (el.scrollTop < 100) {
+        void handleLoadOlder();
+      }
     };
 
     handleScroll();
     el.addEventListener("scroll", handleScroll);
     return () => el.removeEventListener("scroll", handleScroll);
-  }, []);
-
-
-
-  // Poll messages only when socket is disconnected.
-  useEffect(() => {
-    if (!conversationId || socketConnected) return;
-
-    const intervalId = window.setInterval(() => {
-      loadMessages(conversationId);
-    }, 4000);
-
-    return () => {
-      window.clearInterval(intervalId);
-    };
-  }, [conversationId, socketConnected, loadMessages]);
+  }, [handleLoadOlder]);
 
 
   // Auto-scroll on initial load / conversation switch / incoming new messages.
@@ -122,13 +129,31 @@ export default function Chat() {
 
   return (
     <div className="flex h-full flex-col">
-      <ChatTopBar
-        displayName={activeConversation?.participant.displayName ?? ""}
-      />
+
+      <div onClick={() => setIsProfileOpen(true)}>
+        <ChatTopBar
+          displayName={activeConversation?.participant.displayName ?? ""}
+        />
+      </div>
+
+      {isProfileOpen &&
+        (
+          <div className="p-5">
+            <ContactProfileCard
+              name={activeConversation?.participant.displayName} uniqueUserId={activeConversation?.participant.uniqueUserId}></ContactProfileCard>
+          </div>
+        )
+      }
+
 
       <div ref={scrollRef} className="flex-1 overflow-y-scroll">
+        {loadingOlder && (
+          <div className="py-2 text-center text-xs text-gray-400">
+            Loading older messages...
+          </div>
+        )}
+
         {messages.map((message) => {
-          console.log(message)
           const isSent = currentUserId
             ? message.senderId === currentUserId
             : false;

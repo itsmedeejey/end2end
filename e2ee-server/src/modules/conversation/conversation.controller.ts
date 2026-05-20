@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Post,
+  Patch,
   Get,
   Query,
   Req,
@@ -10,6 +11,8 @@ import {
 import type { Request } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ToDto } from './dto/to.dto';
+import { syncMessgaesDto } from './dto/syncMessgaes.dto';
+import { MarkConversationReadDto } from './dto/markConversationRead.dto';
 import { ConversationService } from './conversation.service';
 import { JwtPayload } from '../auth/types/jwt-payload.type';
 import { FindOrCreateConversationResponse } from './types/findOrCreateConversationResponse.type';
@@ -43,6 +46,38 @@ export class ConversationController {
     );
     return messages;
   }
+
+
+  //syncing laest messages
+  @Get('sync')
+  @UseGuards(JwtAuthGuard)
+  async syncMessages(
+    @Query() dto: syncMessgaesDto,
+    @Req() req: Request & { user: JwtPayload }
+  ): Promise<GetChatsResponse> {
+
+    const conversationId = dto.conversationId;
+    const after = dto.after;
+
+    return await this.conversationService.syncNewMessage(req.user.sub, conversationId, after)
+  }
+
+  @Patch('read')
+  @UseGuards(JwtAuthGuard)
+  async markConversationRead(
+    @Body() dto: MarkConversationReadDto,
+    @Req() req: Request & { user: JwtPayload },
+  ): Promise<{ ok: true }> {
+    await this.conversationService.markConversationRead(
+      req.user.sub,
+      dto.conversationId,
+      dto.messageId,
+    );
+
+    return { ok: true };
+  }
+
+
 
 
   // this route is for searching a user returning conversation id if exist or create it ...

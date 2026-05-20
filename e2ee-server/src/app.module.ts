@@ -8,7 +8,7 @@ import { WebsocketModule } from './modules/websocket/websocket.module';
 import { KeysModule } from './modules/keys/keys.module';
 
 @Module({
-  imports: [AuthModule, PrismaModule, ConversationModule, WebsocketModule, KeysModule,],
+  imports: [AuthModule, PrismaModule, ConversationModule, WebsocketModule, KeysModule],
   controllers: [AppController],
   providers: [AppService], //removed WebsocketGateway here
 })
