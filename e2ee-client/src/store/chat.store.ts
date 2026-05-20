@@ -177,6 +177,9 @@ export const useChatStore = create<ChatStore>((set, get) => ({
 
   setIsSearchOpen: (open) => set({ isSearchOpen: open }),
 
+  setIsProfileOpen: (open) => set({ isProfileOpen: open }),
+
+
   loadConversations: async () => {
     const cached = await getCachedConversations();
     if (cached.length > 0) {
