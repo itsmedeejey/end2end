@@ -283,6 +283,7 @@ export class ConversationService {
     before?: string,
     limit = 30,
   ): Promise<PaginatedMessagesResponse> {
+
     await this.assertConversationMember(userId, conversationId);
 
     const rows = await this.prisma.message.findMany({
@@ -312,7 +313,7 @@ export class ConversationService {
     return {
       messages: page,
       hasMore,
-      nextCursor: page[0]?.id ?? null,
+      nextCursor: hasMore ? page[0]?.id ?? null : null,
     };
   }
 

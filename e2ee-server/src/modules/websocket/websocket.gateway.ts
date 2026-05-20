@@ -245,7 +245,7 @@ export class WebsocketGateway
       clientTempId,
     });
 
-    // Legacy event kept temporarily for older clients during rollout.
+    // Legacy event kept temporarily for older clients 
     client.to(conversationId).emit('receive_message', messagePayload);
 
     return {
@@ -302,6 +302,19 @@ export class WebsocketGateway
       orderBy: { id: 'desc' },
       select: { id: true },
     }))?.id;
+
+    const member = await this.prisma.conversationMember.findUnique({
+      where: {
+        conversationId_userId: {
+          conversationId: data.conversationId,
+          userId: user.sub,
+        },
+      },
+    });
+
+    if (!member) {
+      throw new WsException('Not a member of this conversation');
+    }
 
     await this.prisma.conversationMember.update({
       where: {

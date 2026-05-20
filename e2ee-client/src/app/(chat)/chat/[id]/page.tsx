@@ -10,6 +10,7 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useChatSocket } from "@/hooks/useChatSocket";
 import useConversationMsg from "@/hooks/useConversationMsg";
 import { getSocket } from "@/lib/socket/socket";
+import ContactProfileCard from "@/components/contactProfileCard";
 
 
 export default function Chat() {
