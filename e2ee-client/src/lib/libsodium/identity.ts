@@ -17,8 +17,7 @@ export async function generateIdentityKeys() {
 
 
     await saveIdentityKeys(publicKey, privateKey);
-    return publicKey
-      ;
+    return publicKey;
   } catch (err) {
     console.error(err);
     throw err;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
-import api from "@/config/axios";
+import api from '@/config/axios';
 
 import {
   getLatestMessages,

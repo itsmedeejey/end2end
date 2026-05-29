@@ -88,6 +88,4 @@ export class AuthController {
     this.setAuthCookies(res, newTokens)
   }
 
-
-
 }

@@ -346,11 +346,8 @@ export class ConversationService {
     return rows.map((message) => this.toMessageResponse(message));
   }
 
-  /*
-    Deprecated full-history loader kept for existing callers.
-    New chat screens should use
-    GET /api/messages/:conversationId with before/limit pagination.
-  */
+
+  // Deprecated full-history loader.
   async GetChats(
     currentUserId: string,
     conversationId: string,
