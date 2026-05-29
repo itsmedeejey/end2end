@@ -5,10 +5,13 @@ import { getSocket } from "@/lib/socket/socket";
 import { useChatStore } from "@/store/chat.store";
 import { useAuthStore } from "@/store/auth.store";
 import { getLatestSyncedMessage, saveMessages } from "@/lib/idb/chat-db";
+import { deriveSessionKey } from "@/lib/libsodium/session";
+import { getIdentityKeys, saveSessionKey } from "@/lib/libsodium/store/sodiumStore";
 import {
     decryptIncomingMessages,
     IncomingEncryptedMessage,
 } from "@/lib/chat/messages";
+import api from "@/config/axios";
 
 type SyncAck = {
     messages?: IncomingEncryptedMessage[];
@@ -101,14 +104,36 @@ export const useSocketConnection = () => {
             }
 
             try {
-                const [normalizedMessage] = await decryptIncomingMessages(
+
+                let [normalizedMessage] = await decryptIncomingMessages(
                     [message],
                     peerUserId
                 );
-
-                //FIX:  if decryptIncomingMessages fails the identity keys should be refetch  
-
                 if (!normalizedMessage) return;
+
+                if (normalizedMessage.decryptFailed) {
+
+                    console.warn("Decrypt failed, refreshing session key");
+
+                    //refetching new identity key if decryptIncomingMessages fails
+                    const response = await api.get(`/api/keys/${peerUserId}`);
+                    const ReceiverPubKey = response.data.publicKey;
+
+                    const keys = await getIdentityKeys()
+                    if (!keys) {
+                        throw new Error(
+                            "identity keys missing"
+                        );
+                    }
+                    const sessionKey = await deriveSessionKey(keys?.privateKey, ReceiverPubKey);
+                    await saveSessionKey(message.conversationId, sessionKey);
+
+                    // now it will retry with new session keys
+                    [normalizedMessage] = await decryptIncomingMessages(
+                        [message],
+                        peerUserId
+                    );
+                }
 
                 await saveMessages([normalizedMessage]);
                 appendMessages(message.conversationId, [normalizedMessage]);
