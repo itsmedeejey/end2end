@@ -34,8 +34,7 @@ const origins = process.env.CORS_ORIGINS
     },
 })
 
-export class WebsocketGateway
-    implements OnGatewayConnection, OnGatewayDisconnect {
+export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     @WebSocketServer()
     server: Server;
@@ -68,11 +67,8 @@ export class WebsocketGateway
     async handleConnection(client: Socket) {
         try {
             //  Extract token
-
             const raw = client.handshake.headers?.cookie || "";
-
             const parsed = cookie.parse(raw);
-
             const token = parsed["accessToken"];
 
             if (typeof token !== 'string' || token.length === 0) {
@@ -132,13 +128,13 @@ export class WebsocketGateway
 
 
     // deprecated
-    @SubscribeMessage('join:conversation')
-    async handleLegacyJoinConversation(
-        @MessageBody() conversationId: string,
-        @ConnectedSocket() client: Socket,
-    ) {
-        return this.handleJoinConversation(conversationId, client);
-    }
+    // @SubscribeMessage('join:conversation')
+    // async handleLegacyJoinConversation(
+    //     @MessageBody() conversationId: string,
+    //     @ConnectedSocket() client: Socket,
+    // ) {
+    //     return this.handleJoinConversation(conversationId, client);
+    // }
 
     @SubscribeMessage('conversation:leave')
     async handleLeaveConversation(
@@ -149,13 +145,13 @@ export class WebsocketGateway
     }
 
     // deprecated
-    @SubscribeMessage('leave:conversation')
-    async handleLegacyLeaveConversation(
-        @MessageBody() conversationId: string,
-        @ConnectedSocket() client: Socket,
-    ) {
-        return this.handleLeaveConversation(conversationId, client);
-    }
+    // @SubscribeMessage('leave:conversation')
+    // async handleLegacyLeaveConversation(
+    //     @MessageBody() conversationId: string,
+    //     @ConnectedSocket() client: Socket,
+    // ) {
+    //     return this.handleLeaveConversation(conversationId, client);
+    // }
 
 
     // DISCONNECT HANDLER
@@ -250,23 +246,23 @@ export class WebsocketGateway
         });
 
         // Legacy event kept temporarily for older clients 
-        client.to(conversationId).emit('receive_message', messagePayload);
+        //client.to(conversationId).emit('receive_message', messagePayload);
 
-        return {
-            status: 'ok',
-            messageId: message.id,
-            createdAt: serverCreatedAt,
-            clientTempId,
-        };
+        // return {
+        //     status: 'ok',
+        //     messageId: message.id,
+        //     createdAt: serverCreatedAt,
+        //     clientTempId,
+        // };
     }
-
-    @SubscribeMessage('send_message')
-    async handleLegacySendMessage(
-        @MessageBody() data: SendMessageDto,
-        @ConnectedSocket() client: Socket,
-    ) {
-        return this.handleNewMessage(data, client);
-    }
+    //
+    // @SubscribeMessage('send_message')
+    // async handleLegacySendMessage(
+    //     @MessageBody() data: SendMessageDto,
+    //     @ConnectedSocket() client: Socket,
+    // ) {
+    //     return this.handleNewMessage(data, client);
+    // }
 
     @SubscribeMessage('message:sync')
     async handleMessageSync(
@@ -332,7 +328,6 @@ export class WebsocketGateway
                 lastReadAt: new Date(),
             },
         });
-
         return { ok: true };
     }
 
@@ -373,5 +368,11 @@ export class WebsocketGateway
             messageId: data.messageId,
             userId: user.sub,
         });
+    }
+
+    async emitNewConversation(userid: string, conversationId: string) {
+        this.server.to(`user:${userid}`).emit("conversation:new")
+
+
     }
 }

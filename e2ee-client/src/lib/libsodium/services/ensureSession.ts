@@ -9,11 +9,8 @@ export async function ensureSession(
     conversationId: string,
     receiverId: string
 ) {
-
-
     try {
         let sessionKey = await getSessionKey(conversationId)
-
         if (sessionKey) return sessionKey;
 
         const response = await api.get(`/api/keys/${receiverId}`);
