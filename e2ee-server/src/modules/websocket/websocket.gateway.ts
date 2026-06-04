@@ -370,9 +370,8 @@ export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnec
         });
     }
 
-    async emitNewConversation(userid: string, conversationId: string) {
-        this.server.to(`user:${userid}`).emit("conversation:new")
-
-
+    //TODO: new conversation should show up without refersh
+    emitNewConversation(userid: string, conversation: any) {
+        this.server.to(`user:${userid}`).emit("conversation:new", conversation)
     }
 }

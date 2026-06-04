@@ -169,7 +169,6 @@ export const useSocketConnection = () => {
         socket.on("connect", handleConnect);
         socket.on("disconnect", handleDisconnect);
         socket.on("message:new", handleIncomingMessage);
-        //socket.on("receive_message", handleIncomingMessage);
         socket.on("connect_error", handleConnectError);
 
         if (socket.connected) {
@@ -181,7 +180,6 @@ export const useSocketConnection = () => {
             socket.off("connect", handleConnect);
             socket.off("disconnect", handleDisconnect);
             socket.off("message:new", handleIncomingMessage);
-            //   socket.off("receive_message", handleIncomingMessage);
             socket.off("connect_error", handleConnectError);
         };
     }, [
