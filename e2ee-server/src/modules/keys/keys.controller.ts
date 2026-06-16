@@ -7,35 +7,33 @@ import { ValidationPipe } from '@nestjs/common';
 import { IndentityKeyDto } from './dto/storeKeys.dto';
 
 @UsePipes(new ValidationPipe({
-  whitelist: true,
-  forbidNonWhitelisted: true,
-  transform: true
+    whitelist: true,
+    forbidNonWhitelisted: true,
+    transform: true
 }))
 
 @Controller('keys')
 export class KeysController {
-  constructor(private readonly keyService: KeysService) { };
+    constructor(private readonly keyService: KeysService) { };
 
-  @Post('upload')
-  @UseGuards(JwtAuthGuard)
-  async storeKeys(
+    @Post('upload')
+    @UseGuards(JwtAuthGuard)
+    async storeKeys(
 
-    @Req() req: Request & { user: JwtPayload },
-    @Body() dto: IndentityKeyDto) {
+        @Req() req: Request & { user: JwtPayload },
+        @Body() dto: IndentityKeyDto) {
 
-    return await this.keyService.storePublickey(dto.publicKey, req.user.sub)
-  }
-
-
-  //get preKeys for the user
-  @Get(':receiverId')
-  @UseGuards(JwtAuthGuard)
-  async getKeys(
-    @Param('receiverId') receiverId: string,
-  ) {
-    const keys = await this.keyService.getPublicKeys(receiverId);
-    return keys;
-  }
+        return await this.keyService.storePublickey(dto.publicKey, req.user.sub)
+    }
 
 
+    //get preKeys for the user
+    @Get(':receiverId')
+    @UseGuards(JwtAuthGuard)
+    async getKeys(
+        @Param('receiverId') receiverId: string,
+    ) {
+        const keys = await this.keyService.getPublicKeys(receiverId);
+        return keys;
+    }
 }

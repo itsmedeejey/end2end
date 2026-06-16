@@ -1,0 +1,83 @@
+<?xml version="1.0" ?>
+<mxfile host="app.diagrams.net">
+  <diagram name="ERD">
+    <mxGraphModel>
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="2" value="User" style="shape=rectangle;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="80" width="140" height="60" as_="geometry"/>
+        </mxCell>
+        <mxCell id="3" value="Conversation" style="shape=rectangle;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="420" y="80" width="140" height="60" as_="geometry"/>
+        </mxCell>
+        <mxCell id="4" value="ConversationMember" style="shape=rectangle;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="250" y="250" width="140" height="60" as_="geometry"/>
+        </mxCell>
+        <mxCell id="5" value="Message" style="shape=rectangle;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="420" y="420" width="140" height="60" as_="geometry"/>
+        </mxCell>
+        <mxCell id="6" value="UserIdentityKey" style="shape=rectangle;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="420" width="140" height="60" as_="geometry"/>
+        </mxCell>
+        <mxCell id="7" value="RefreshToken" style="shape=rectangle;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="620" width="140" height="60" as_="geometry"/>
+        </mxCell>
+        <mxCell id="10" value="participates in" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="0" y="0" width="100" height="60" as_="geometry"/>
+        </mxCell>
+        <mxCell id="10a" edge="1" parent="1" source="2" target="10" style="endArrow=none;html=1;">
+          <mxGeometry relative="1" as_="geometry"/>
+        </mxCell>
+        <mxCell id="10b" edge="1" parent="1" source="10" target="4" style="endArrow=none;html=1;">
+          <mxGeometry relative="1" as_="geometry"/>
+        </mxCell>
+        <mxCell id="11" value="belongs to" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="0" y="0" width="100" height="60" as_="geometry"/>
+        </mxCell>
+        <mxCell id="11a" edge="1" parent="1" source="4" target="11" style="endArrow=none;html=1;">
+          <mxGeometry relative="1" as_="geometry"/>
+        </mxCell>
+        <mxCell id="11b" edge="1" parent="1" source="11" target="3" style="endArrow=none;html=1;">
+          <mxGeometry relative="1" as_="geometry"/>
+        </mxCell>
+        <mxCell id="12" value="contains" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="0" y="0" width="100" height="60" as_="geometry"/>
+        </mxCell>
+        <mxCell id="12a" edge="1" parent="1" source="3" target="12" style="endArrow=none;html=1;">
+          <mxGeometry relative="1" as_="geometry"/>
+        </mxCell>
+        <mxCell id="12b" edge="1" parent="1" source="12" target="5" style="endArrow=none;html=1;">
+          <mxGeometry relative="1" as_="geometry"/>
+        </mxCell>
+        <mxCell id="13" value="sends" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="0" y="0" width="100" height="60" as_="geometry"/>
+        </mxCell>
+        <mxCell id="13a" edge="1" parent="1" source="2" target="13" style="endArrow=none;html=1;">
+          <mxGeometry relative="1" as_="geometry"/>
+        </mxCell>
+        <mxCell id="13b" edge="1" parent="1" source="13" target="5" style="endArrow=none;html=1;">
+          <mxGeometry relative="1" as_="geometry"/>
+        </mxCell>
+        <mxCell id="14" value="has" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="0" y="0" width="100" height="60" as_="geometry"/>
+        </mxCell>
+        <mxCell id="14a" edge="1" parent="1" source="2" target="14" style="endArrow=none;html=1;">
+          <mxGeometry relative="1" as_="geometry"/>
+        </mxCell>
+        <mxCell id="14b" edge="1" parent="1" source="14" target="6" style="endArrow=none;html=1;">
+          <mxGeometry relative="1" as_="geometry"/>
+        </mxCell>
+        <mxCell id="15" value="owns" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="0" y="0" width="100" height="60" as_="geometry"/>
+        </mxCell>
+        <mxCell id="15a" edge="1" parent="1" source="2" target="15" style="endArrow=none;html=1;">
+          <mxGeometry relative="1" as_="geometry"/>
+        </mxCell>
+        <mxCell id="15b" edge="1" parent="1" source="15" target="7" style="endArrow=none;html=1;">
+          <mxGeometry relative="1" as_="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

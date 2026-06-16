@@ -1,4 +1,3 @@
-
 import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import { PrismaService } from "src/database/prisma.service";
 
@@ -26,12 +25,7 @@ export class KeysService {
     } catch (err) {
       throw new InternalServerErrorException(err, "Could not register device keys");
     }
-
-
   }
-
-
-
 
   async getPublicKeys(userUniqueId: string) {
 
@@ -54,7 +48,6 @@ export class KeysService {
     } catch {
       throw new InternalServerErrorException("could not find publicKey")
     }
-
   }
 }
 

@@ -6,48 +6,59 @@ import * as fs from 'fs';
 import * as path from 'path';
 import cookieParser from 'cookie-parser';
 import { ValidationPipe } from '@nestjs/common';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
-  let app: NestExpressApplication;
+    let app: NestExpressApplication;
 
-  if (process.env.NODE_ENV === 'production') {
-    app = await NestFactory.create<NestExpressApplication>(AppModule);
-  } else {
-    const httpsOptions = {
-      key: fs.readFileSync(path.join(process.cwd(), 'localhost+2-key.pem')),
-      cert: fs.readFileSync(path.join(process.cwd(), 'localhost+2.pem')),
-    };
+    if (process.env.NODE_ENV === 'production') {
+        app = await NestFactory.create<NestExpressApplication>(AppModule);
+    } else {
+        const httpsOptions = {
+            key: fs.readFileSync(path.join(process.cwd(), 'localhost+2-key.pem')),
+            cert: fs.readFileSync(path.join(process.cwd(), 'localhost+2.pem')),
+        };
 
-    app = await NestFactory.create<NestExpressApplication>(AppModule, {
-      httpsOptions,
+        app = await NestFactory.create<NestExpressApplication>(AppModule, {
+            httpsOptions,
+        });
+    }
+
+    // needed for proxies Render, Vercel 
+    app.set('trust proxy', 1);
+
+    const origins = process.env.CORS_ORIGINS
+        ?.split(',')
+        .map(o => o.trim()) || [];
+
+    app.enableCors({
+        origin: origins,
+        credentials: true,
     });
-  }
 
-  // needed for proxies Render, Vercel 
-  app.set('trust proxy', 1);
+    app.use(cookieParser());
 
-  const origins = process.env.CORS_ORIGINS
-    ?.split(',')
-    .map(o => o.trim()) || [];
+    app.useGlobalPipes(
+        new ValidationPipe({
+            transform: true,
+            whitelist: true,
+            forbidNonWhitelisted: true,
+        }),
+    );
 
-  app.enableCors({
-    origin: origins,
-    credentials: true,
-  });
+    // for swagger api documentation
+    const config = new DocumentBuilder()
+        .setTitle('end2end')
+        .setDescription('The end2end API description')
+        .setVersion('1.0')
+        .addTag('end2end')
+        .build();
+    const documentFactory = () => SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('doc', app, documentFactory);
 
-  app.use(cookieParser());
+    app.setGlobalPrefix('api');
 
-  app.useGlobalPipes(
-    new ValidationPipe({
-      transform: true,
-      whitelist: true,
-      forbidNonWhitelisted: true,
-    }),
-  );
-
-  app.setGlobalPrefix('api');
-
-  await app.listen(process.env.PORT ?? 4000);
+    await app.listen(process.env.PORT ?? 4000);
 }
 
 void bootstrap();
