@@ -14,6 +14,7 @@ export async function ensureSession(
         if (sessionKey) return sessionKey;
 
         const response = await api.get(`/api/keys/${receiverId}`);
+
         const ReceiverPubKey = response.data.publicKey;
 
         const keys = await getIdentityKeys()

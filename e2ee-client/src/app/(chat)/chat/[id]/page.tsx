@@ -25,7 +25,7 @@ export default function Chat() {
     const setActiveConversationId = useChatStore((s) => s.setActiveConversationId);
     const currentUserId = useAuthStore((s) => s.uniqueUserId);
 
-    const { joinConversation, leaveConversation } = useChatSocket();
+    const { joinConversation } = useChatSocket();
 
     const scrollRef = useRef<HTMLDivElement>(null);
     const bottomRef = useRef<HTMLDivElement>(null);
@@ -38,13 +38,9 @@ export default function Chat() {
     //when a new conversatioin is added this connects the user to the that converstion room
     useEffect(() => {
         if (!conversationId) return;
-
         joinConversation(conversationId);
 
-        return () => {
-            leaveConversation(conversationId);
-        };
-    }, [conversationId, joinConversation, leaveConversation]);
+    }, [conversationId, joinConversation]);
 
     useEffect(() => {
         if (!conversationId) return;

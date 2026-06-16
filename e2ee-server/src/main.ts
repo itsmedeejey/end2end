@@ -46,6 +46,7 @@ async function bootstrap() {
         }),
     );
 
+    // for swagger api documentation
     const config = new DocumentBuilder()
         .setTitle('end2end')
         .setDescription('The end2end API description')
