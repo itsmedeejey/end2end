@@ -18,6 +18,7 @@ import * as cookie from 'cookie';
 import { SendMessageDto } from './dto/sendMessage.dto';
 import { v7 as uuidV7 } from 'uuid';
 import { ConversationService } from '../conversation/conversation.service';
+import { FindOrCreateConversationResponse } from '../conversation/types/findOrCreateConversationResponse.type';
 
 interface GatewaySocketData {
     user?: JwtPayload;
@@ -63,6 +64,8 @@ export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnec
         return user;
     }
 
+    private connectedUsers = new Map<string, Socket>
+
     //  CONNECTION HANDLER
     async handleConnection(client: Socket) {
         try {
@@ -80,6 +83,9 @@ export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnec
 
             //  Attach user to socket
             this.setSocketUser(client, payload);
+
+            // maping the user to their socket
+            this.connectedUsers.set(payload.sub, client)
 
             const userId = payload.sub;
 
@@ -159,8 +165,10 @@ export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnec
         const user = this.getSocketUser(client);
 
         if (user) {
+            this.connectedUsers.delete(user.sub);
             this.logger.log(`User disconnected: ${user.sub}`);
         }
+
     }
 
     // SEND MESSAGE
@@ -238,22 +246,24 @@ export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnec
 
         this.server.to(conversationId).emit('message:new', messagePayload);
         this.server.to(conversationId).emit('conversation:update', conversationPayload);
-        client.emit('message:ack', {
-            status: 'ok',
-            messageId: message.id,
-            createdAt: serverCreatedAt,
-            clientTempId,
-        });
 
-        // Legacy event kept temporarily for older clients 
-        //client.to(conversationId).emit('receive_message', messagePayload);
 
-        // return {
+        // client.emit('message:ack', {
         //     status: 'ok',
         //     messageId: message.id,
         //     createdAt: serverCreatedAt,
         //     clientTempId,
-        // };
+        // });
+
+        // Legacy event kept temporarily for older clients 
+        //client.to(conversationId).emit('receive_message', messagePayload);
+
+        return {
+            status: 'ok',
+            messageId: message.id,
+            createdAt: serverCreatedAt,
+            clientTempId,
+        };
     }
     //
     // @SubscribeMessage('send_message')
@@ -331,19 +341,20 @@ export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnec
         return { ok: true };
     }
 
+    //TODO: for future scope 
     // TYPING INDICATOR
-    @SubscribeMessage('typing')
-    handleTyping(
-        @MessageBody()
-        data: { conversationId: string },
-        @ConnectedSocket() client: Socket,
-    ) {
-        const user = this.getRequiredSocketUser(client);
-
-        client.to(data.conversationId).emit('typing', {
-            userId: user.sub,
-        });
-    }
+    // @SubscribeMessage('typing')
+    // handleTyping(
+    //     @MessageBody()
+    //     data: { conversationId: string },
+    //     @ConnectedSocket() client: Socket,
+    // ) {
+    //     const user = this.getRequiredSocketUser(client);
+    //
+    //     client.to(data.conversationId).emit('typing', {
+    //         userId: user.sub,
+    //     });
+    // }
 
     //  MESSAGE READ
     @SubscribeMessage('mark_read')
@@ -370,8 +381,40 @@ export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnec
         });
     }
 
-    //TODO: new conversation should show up without refersh
-    emitNewConversation(userid: string, conversation: any) {
-        this.server.to(`user:${userid}`).emit("conversation:new", conversation)
+    // new conversation should show up without refersh
+    // what i want it to do is when a new conversation is started by a user
+    // the orther user's contactsBar should show this user's card
+    // currently what is happing is the realtime msg failed as
+    // the other user initially doesn't joint the channel with this user
+    //
+    //FIX: the fix is.....
+    // when a new conversation is created the findorcreateConversation() will call
+    // this function which will take the userid and conversation 
+    // ( what is conversation i currently don't know) ans:- conversation is  all the information
+    // about the conversaiton like conversationId and the participant's Id
+
+    async handleNewConversation(
+        conversationId: string,
+        users: {
+            userId: string;
+            payload: FindOrCreateConversationResponse;
+        }[],
+    ) {
+        await Promise.all(
+            users.map(async ({ userId, payload }) => {
+                const socket = this.connectedUsers.get(userId);
+                if (!socket) return;
+
+                await socket.join(conversationId);
+                socket.emit(
+                    "conversation:new",
+                    payload,
+                );
+            }),
+        );
     }
 }
+
+
+
+

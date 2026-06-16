@@ -18,11 +18,15 @@ import { JwtPayload } from '../auth/types/jwt-payload.type';
 import { FindOrCreateConversationResponse } from './types/findOrCreateConversationResponse.type';
 import { GetConversationsResponse } from './types/getConversationsResponse.type';
 import { GetChatsResponse } from './types/getChatsResponse.type';
+import { WebsocketGateway } from '../websocket/websocket.gateway';
 
 
 @Controller('conversation')
 export class ConversationController {
-    constructor(private readonly conversationService: ConversationService) { }
+    constructor(
+        private readonly conversationService: ConversationService,
+        private readonly websocketGateway: WebsocketGateway
+    ) { }
 
     @Get()
     @UseGuards(JwtAuthGuard)
@@ -34,18 +38,18 @@ export class ConversationController {
         return conversation;
     }
 
-    @Get('loadchats')
-    @UseGuards(JwtAuthGuard)
-    async getChats(
-        @Query('conversationId') conversationId: string,
-        @Req() req: Request & { user: JwtPayload },
-    ): Promise<GetChatsResponse> {
-        const messages = await this.conversationService.GetChats(
-            req.user.sub,
-            conversationId,
-        );
-        return messages;
-    }
+    // @Get('loadchats')
+    // @UseGuards(JwtAuthGuard)
+    // async getChats(
+    //     @Query('conversationId') conversationId: string,
+    //     @Req() req: Request & { user: JwtPayload },
+    // ): Promise<GetChatsResponse> {
+    //     const messages = await this.conversationService.GetChats(
+    //         req.user.sub,
+    //         conversationId,
+    //     );
+    //     return messages;
+    // }
 
 
     //syncing laest messages
@@ -85,8 +89,36 @@ export class ConversationController {
         @Body() dto: ToDto,
         @Req() req: Request & { user: JwtPayload },
     ): Promise<FindOrCreateConversationResponse> {
-        const conversation: Promise<FindOrCreateConversationResponse> =
-            this.conversationService.findOrCreateConversationId(dto.to, req.user.sub);
+        const currentUser = req.user.sub;
+        const conversation: FindOrCreateConversationResponse = await this.conversationService.findOrCreateConversationId(dto.to, currentUser);
+
+        // for realtime convertion-sidebar update on creating new conversaiton without refresh
+        const creatorPayload = conversation;
+        const receiverPayload = {
+            conversationId: conversation.conversationId,
+            participant: {
+                userId: req.user.sub,
+                uniqueUserId: req.user.uid,
+                displayName: req.user.name,
+            },
+        };
+
+        if (conversation && conversation.participant.userId) {
+            await this.websocketGateway.handleNewConversation(
+                conversation.conversationId,
+                [
+                    {
+                        userId: currentUser,
+                        payload: creatorPayload,
+                    },
+                    {
+                        userId: conversation.participant.userId,
+                        payload: receiverPayload,
+                    },
+                ],
+            );
+        }
+
         return conversation;
     }
 

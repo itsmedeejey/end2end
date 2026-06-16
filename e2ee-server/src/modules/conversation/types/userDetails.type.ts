@@ -1,4 +1,5 @@
 export interface userDetails {
-  uniqueUserId: string,
-  displayName: string,
+    uniqueUserId: string,
+    displayName: string,
+    userId?: string,
 }

@@ -17,10 +17,18 @@ type SyncAck = {
     messages?: IncomingEncryptedMessage[];
 };
 
+type Payload = {
+    conversationId: string;
+    participant: {
+        uniqueUserId: string,
+        displayName: string,
+    };
+}
 export const useSocketConnection = () => {
     const activeConversationId = useChatStore((s) => s.activeConversationId);
     const appendMessages = useChatStore((s) => s.appendMessages);
     const conversations = useChatStore((s) => s.conversations);
+    const addConversation = useChatStore((s) => s.addConversation);
     const markConversationRead = useChatStore((s) => s.markConversationRead);
     const markSocketConnected = useChatStore((s) => s.markSocketConnected);
     const updateConversationFromMessage = useChatStore(
@@ -110,13 +118,10 @@ export const useSocketConnection = () => {
                 if (!normalizedMessage) return;
 
                 if (normalizedMessage.decryptFailed) {
-
                     console.warn("Decrypt failed, refreshing session key");
-
                     //refetching new identity key if decryptIncomingMessages fails
                     const response = await api.get(`/api/keys/${peerUserId}`);
                     const ReceiverPubKey = response.data.publicKey;
-
                     const keys = await getIdentityKeys()
                     if (!keys) {
                         throw new Error(
@@ -155,6 +160,12 @@ export const useSocketConnection = () => {
             }
         };
 
+        //handles new conversation and updates ui in realtime
+        const handleConversation = async (payload: Payload) => {
+            console.log(payload);
+            addConversation(payload);
+        };
+
         const handleConnectError = (err: Error) => {
             console.error("Socket error:", err.message);
 
@@ -169,6 +180,7 @@ export const useSocketConnection = () => {
         socket.on("connect", handleConnect);
         socket.on("disconnect", handleDisconnect);
         socket.on("message:new", handleIncomingMessage);
+        socket.on("conversation:new", handleConversation)
         socket.on("connect_error", handleConnectError);
 
         if (socket.connected) {
@@ -181,8 +193,11 @@ export const useSocketConnection = () => {
             socket.off("disconnect", handleDisconnect);
             socket.off("message:new", handleIncomingMessage);
             socket.off("connect_error", handleConnectError);
+            socket.off("conversation:new", handleConversation);
+
         };
     }, [
+        addConversation,
         activeConversationId,
         appendMessages,
         conversations,
