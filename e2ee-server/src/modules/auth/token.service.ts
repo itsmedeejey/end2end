@@ -53,6 +53,7 @@ export class TokenService {
 
     await this.prisma.refreshToken.create({
       data: {
+        id: sessionId,
         userId,
         tokenHash: hashRefreshToken,
         expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),

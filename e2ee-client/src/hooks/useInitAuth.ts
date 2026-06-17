@@ -22,7 +22,7 @@ export const useInitAuth = () => {
 
         const init = async (retry = 0): Promise<void> => {
             try {
-                const res = await api.get("api/auth/me");
+                const res = await api.get("/api/auth/me");
 
                 const userId = res.data?.user?.sub;
                 const uniqueUserId = res.data?.user?.uid;

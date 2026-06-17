@@ -172,7 +172,7 @@ export type RefreshTokenGroupByOutputType = {
   _max: RefreshTokenMaxAggregateOutputType | null
 }
 
-type GetRefreshTokenGroupByPayload<T extends RefreshTokenGroupByArgs> = Prisma.PrismaPromise<
+export type GetRefreshTokenGroupByPayload<T extends RefreshTokenGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<RefreshTokenGroupByOutputType, T['by']> &
       {
@@ -253,7 +253,7 @@ export type RefreshTokenScalarWhereWithAggregatesInput = {
 }
 
 export type RefreshTokenCreateInput = {
-  id?: string
+  id: string
   tokenHash: string
   expiresAt: Date | string
   revokedAt?: Date | string | null
@@ -263,7 +263,7 @@ export type RefreshTokenCreateInput = {
 }
 
 export type RefreshTokenUncheckedCreateInput = {
-  id?: string
+  id: string
   userId: string
   tokenHash: string
   expiresAt: Date | string
@@ -293,7 +293,7 @@ export type RefreshTokenUncheckedUpdateInput = {
 }
 
 export type RefreshTokenCreateManyInput = {
-  id?: string
+  id: string
   userId: string
   tokenHash: string
   expiresAt: Date | string
@@ -404,7 +404,7 @@ export type RefreshTokenUncheckedUpdateManyWithoutUserNestedInput = {
 }
 
 export type RefreshTokenCreateWithoutUserInput = {
-  id?: string
+  id: string
   tokenHash: string
   expiresAt: Date | string
   revokedAt?: Date | string | null
@@ -413,7 +413,7 @@ export type RefreshTokenCreateWithoutUserInput = {
 }
 
 export type RefreshTokenUncheckedCreateWithoutUserInput = {
-  id?: string
+  id: string
   tokenHash: string
   expiresAt: Date | string
   revokedAt?: Date | string | null
@@ -461,7 +461,7 @@ export type RefreshTokenScalarWhereInput = {
 }
 
 export type RefreshTokenCreateManyUserInput = {
-  id?: string
+  id: string
   tokenHash: string
   expiresAt: Date | string
   revokedAt?: Date | string | null

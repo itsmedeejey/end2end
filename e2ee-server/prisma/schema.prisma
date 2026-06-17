@@ -123,10 +123,9 @@ model UserIdentityKey {
     user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-// REFRESH TOKENS (MULTI-DEVICE SUPPORT)
-
+// REFRESH TOKENS 
 model RefreshToken {
-    id String @id @default(uuid())
+    id String @id
 
     userId    String
     tokenHash String
