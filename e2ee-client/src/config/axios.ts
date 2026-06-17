@@ -74,7 +74,7 @@ api.interceptors.response.use(
 
             try {
                 // refresh tokens
-                await api.post("api/auth/refresh");
+                await api.post("/api/auth/refresh");
                 // retry waiting requests
                 processQueue();
                 // retry original request

@@ -108,3 +108,4 @@ report.*.json
 # Ignore localhost certificates
 localhost+2.pem
 localhost+2-key.pem
+docs/viva-question-bank.md
